@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>暑假練習本</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FCFAF4;
@@ -31,7 +28,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{
-    font-family:'Fredoka','Noto Sans TC',system-ui,sans-serif;
+    font-family:-apple-system,'PingFang TC','Microsoft JhengHei','Noto Sans TC',system-ui,sans-serif;
     color:var(--ink);
     background:
       radial-gradient(1200px 500px at 85% -10%, rgba(255,154,82,0.10), transparent 60%),
@@ -130,18 +127,18 @@
   .qcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--coral),var(--mango))}
   .qtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--grape);background:var(--grape-tint);padding:4px 12px;border-radius:99px;margin-bottom:18px}
   .qtext{font-size:1.4rem;font-weight:500;line-height:1.5;color:var(--ink)}
-  .qtext .num{font-family:'Fredoka';font-weight:600}
+  .qtext .num{font-family:-apple-system,'PingFang TC',system-ui,sans-serif;font-weight:600}
   .visual{margin:20px 0 4px;display:flex;justify-content:center}
 
   /* fraction */
-  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;font-family:'Fredoka';font-weight:600}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;font-family:-apple-system,'PingFang TC',system-ui,sans-serif;font-weight:600}
   .frac .n{padding:0 6px}
   .frac .d{padding:0 6px;border-top:2.5px solid var(--ink)}
 
   .answer-area{margin-top:26px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .answer-area .lab{font-weight:700;font-size:1.05rem}
   .field{
-    font-family:'Fredoka','Noto Sans TC',sans-serif;font-weight:600;font-size:1.4rem;text-align:center;
+    font-family:-apple-system,'PingFang TC',system-ui,sans-serif,'Noto Sans TC',sans-serif;font-weight:600;font-size:1.4rem;text-align:center;
     border:2.5px solid var(--line);border-radius:14px;padding:10px 14px;width:150px;background:#fff;color:var(--ink);
     transition:border-color .15s, box-shadow .15s;outline:none;
   }
@@ -158,7 +155,7 @@
   .result-head{text-align:center;padding:14px 0 8px}
   .star-wrap{position:relative;width:120px;height:120px;margin:0 auto 6px}
   .star-wrap svg{width:100%;height:100%;filter:drop-shadow(0 8px 16px rgba(255,197,61,.5))}
-  .score-big{font-family:'Fredoka';font-weight:700;font-size:2.6rem;line-height:1.1}
+  .score-big{font-family:-apple-system,'PingFang TC',system-ui,sans-serif;font-weight:700;font-size:2.6rem;line-height:1.1}
   .score-big b{color:var(--grape)}
   .score-msg{font-weight:700;font-size:1.2rem;margin-top:4px}
   .score-sub{color:var(--ink-soft);font-weight:500;margin-top:2px}
@@ -174,7 +171,7 @@
     display:flex;gap:14px;align-items:flex-start;border-left:5px solid var(--leaf);
   }
   .ritem.wrong{border-left-color:var(--coral)}
-  .ritem .mark{font-family:'Fredoka';font-weight:700;font-size:1.5rem;flex:none;width:30px;text-align:center;transform:rotate(-8deg)}
+  .ritem .mark{font-family:-apple-system,'PingFang TC',system-ui,sans-serif;font-weight:700;font-size:1.5rem;flex:none;width:30px;text-align:center;transform:rotate(-8deg)}
   .ritem.ok .mark{color:var(--leaf)}
   .ritem.wrong .mark{color:var(--coral)}
   .ritem .body{flex:1;min-width:0}
@@ -434,9 +431,9 @@ function cuboidSVG(l,w,h){
     <polygon points="40,55 130,55 165,30 75,30" fill="#EEEDFB" stroke="#5A55D6" stroke-width="2"/>
     <polygon points="40,55 130,55 130,125 40,125" fill="#FFFFFF" stroke="#5A55D6" stroke-width="2"/>
     <polygon points="130,55 165,30 165,100 130,125" fill="#E4EAFF" stroke="#5A55D6" stroke-width="2"/>
-    <text x="85" y="145" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">長 ${l}</text>
-    <text x="150" y="135" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">寬 ${w}</text>
-    <text x="20" y="95" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">高 ${h}</text>
+    <text x="85" y="145" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">長 ${l}</text>
+    <text x="150" y="135" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">寬 ${w}</text>
+    <text x="20" y="95" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">高 ${h}</text>
   </svg>`;
 }
 
@@ -1024,9 +1021,12 @@ function startPractice(){
   renderQ();
 }
 
-function renderQ(){
+function renderQ({ clearIfFresh=false }={}){
   const q=state.questions[state.idx];
-  const saved=state.answers[state.idx];
+  // 前進到從未作答的題目時清空；後退永遠顯示已儲存的答案
+  const saved = (clearIfFresh && state.answers[state.idx]===null)
+    ? null
+    : state.answers[state.idx];
   document.getElementById('qnow').textContent=state.idx+1;
   document.getElementById('pfill').style.width=((state.idx+1)/state.count*100)+'%';
   document.getElementById('ptopic').textContent=q.tag;
@@ -1073,7 +1073,8 @@ function saveCurrent(){
 function nextQ(){
   saveCurrent();
   if(state.idx===state.count-1){ finish(); return; }
-  state.idx++; renderQ();
+  state.idx++;
+  renderQ({ clearIfFresh: true });
 }
 function prevQ(){ saveCurrent(); if(state.idx>0){state.idx--;renderQ();} }
 
