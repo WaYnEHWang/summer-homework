@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暑假練習本</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FCFAF4;
+    --card:#FFFFFF;
+    --ink:#2E3148;
+    --ink-soft:#74789A;
+    --grape:#5A55D6;
+    --grape-deep:#3F3AB8;
+    --grape-tint:#EEEDFB;
+    --mango:#FF9A52;
+    --sun:#FFC53D;
+    --leaf:#2FBF71;
+    --leaf-tint:#E4F7EE;
+    --coral:#F26D6D;
+    --coral-tint:#FDEAEA;
+    --grid:rgba(90,85,214,0.09);
+    --line:rgba(46,49,72,0.10);
+    --shadow:0 12px 34px rgba(46,49,72,0.10);
+    --shadow-sm:0 4px 14px rgba(46,49,72,0.08);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Fredoka','Noto Sans TC',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgba(255,154,82,0.10), transparent 60%),
+      radial-gradient(900px 500px at 0% 0%, rgba(90,85,214,0.08), transparent 55%),
+      var(--paper);
+    min-height:100%;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:20px 18px 60px}
+
+  /* ---------- Header ---------- */
+  header.app{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:6px 2px 20px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .logo{
+    width:46px;height:46px;border-radius:14px;flex:none;
+    background:linear-gradient(150deg,var(--grape),var(--grape-deep));
+    display:grid;place-items:center;box-shadow:var(--shadow-sm);position:relative;
+  }
+  .brand .logo svg{width:26px;height:26px}
+  .brand h1{font-size:1.42rem;font-weight:700;letter-spacing:.5px;line-height:1.1}
+  .brand p{font-size:.82rem;color:var(--ink-soft);font-weight:500;margin-top:1px}
+  .tabs{display:flex;gap:6px;background:#fff;padding:5px;border-radius:14px;box-shadow:var(--shadow-sm)}
+  .tab{
+    border:none;background:none;font-family:inherit;font-weight:600;font-size:.92rem;
+    color:var(--ink-soft);padding:7px 16px;border-radius:10px;cursor:pointer;transition:.15s;
+  }
+  .tab.on{background:var(--grape);color:#fff;box-shadow:0 4px 10px rgba(90,85,214,.3)}
+
+  /* ---------- Setup ---------- */
+  .greet{margin:6px 2px 18px}
+  .greet h2{font-size:1.34rem;font-weight:700}
+  .greet h2 .wave{display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 70%}
+  @keyframes wave{0%,60%,100%{transform:rotate(0)}10%{transform:rotate(16deg)}20%{transform:rotate(-8deg)}30%{transform:rotate(16deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}}
+  .greet p{color:var(--ink-soft);font-weight:500;font-size:.95rem;margin-top:2px}
+
+  .section-label{font-size:.82rem;font-weight:700;color:var(--ink-soft);letter-spacing:1.5px;margin:22px 2px 12px;text-transform:uppercase}
+
+  .topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:620px){.topic-grid{grid-template-columns:repeat(4,1fr)}}
+  .topic{
+    position:relative;background:var(--card);border:2px solid transparent;border-radius:var(--radius);
+    padding:16px 14px 14px;cursor:pointer;transition:transform .14s, box-shadow .14s, border-color .14s;
+    box-shadow:var(--shadow-sm);text-align:left;font-family:inherit;
+  }
+  .topic:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .topic .ico{font-size:1.7rem;line-height:1;display:block;margin-bottom:10px}
+  .topic .nm{font-weight:700;font-size:1rem;display:block}
+  .topic .ds{font-size:.76rem;color:var(--ink-soft);font-weight:500;margin-top:2px}
+  .topic .check{
+    position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;
+    background:var(--grape);display:grid;place-items:center;opacity:0;transform:scale(.5);transition:.18s;
+  }
+  .topic .check svg{width:13px;height:13px}
+  .topic.sel{border-color:var(--grape);background:var(--grape-tint)}
+  .topic.sel .check{opacity:1;transform:scale(1)}
+
+  .controls{display:flex;gap:26px;flex-wrap:wrap;margin-top:6px}
+  .ctrl-block{flex:1;min-width:220px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    border:2px solid var(--line);background:#fff;font-family:inherit;font-weight:600;font-size:.92rem;
+    color:var(--ink);padding:8px 16px;border-radius:12px;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{border-color:var(--grape)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .cta-row{margin-top:30px}
+  .btn{
+    font-family:inherit;font-weight:700;font-size:1.05rem;border:none;border-radius:16px;cursor:pointer;
+    padding:15px 26px;transition:transform .12s, box-shadow .12s, background .15s;
+  }
+  .btn:active{transform:translateY(2px)}
+  .btn-primary{background:linear-gradient(150deg,var(--grape),var(--grape-deep));color:#fff;box-shadow:0 10px 22px rgba(90,85,214,.34);width:100%}
+  .btn-primary:hover{box-shadow:0 14px 28px rgba(90,85,214,.42)}
+  .btn-ghost{background:#fff;color:var(--ink);box-shadow:var(--shadow-sm)}
+  .btn-ghost:hover{box-shadow:var(--shadow)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+
+  /* ---------- Practice ---------- */
+  .pbar-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .pbar-top .meta{font-weight:600}
+  .pbar-top .meta b{color:var(--grape)}
+  .pbar-top .topicname{font-size:.86rem;color:var(--ink-soft);font-weight:600}
+  .progress{height:12px;background:#fff;border-radius:99px;box-shadow:inset 0 1px 3px rgba(46,49,72,.08);overflow:hidden;margin-bottom:24px}
+  .progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sun),var(--mango));transition:width .35s ease}
+
+  .qcard{
+    background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:34px 26px 30px;position:relative;overflow:hidden;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;background-position:-1px -1px;
+  }
+  .qcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--coral),var(--mango))}
+  .qtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:1px;color:var(--grape);background:var(--grape-tint);padding:4px 12px;border-radius:99px;margin-bottom:18px}
+  .qtext{font-size:1.4rem;font-weight:500;line-height:1.5;color:var(--ink)}
+  .qtext .num{font-family:'Fredoka';font-weight:600}
+  .visual{margin:20px 0 4px;display:flex;justify-content:center}
+
+  /* fraction */
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;font-family:'Fredoka';font-weight:600}
+  .frac .n{padding:0 6px}
+  .frac .d{padding:0 6px;border-top:2.5px solid var(--ink)}
+
+  .answer-area{margin-top:26px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .answer-area .lab{font-weight:700;font-size:1.05rem}
+  .field{
+    font-family:'Fredoka','Noto Sans TC',sans-serif;font-weight:600;font-size:1.4rem;text-align:center;
+    border:2.5px solid var(--line);border-radius:14px;padding:10px 14px;width:150px;background:#fff;color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;outline:none;
+  }
+  .field:focus{border-color:var(--grape);box-shadow:0 0 0 4px var(--grape-tint)}
+  .field.small{width:84px}
+  .unit{font-weight:600;font-size:1.05rem;color:var(--ink-soft)}
+  .hint{font-size:.82rem;color:var(--ink-soft);font-weight:500;margin-top:10px}
+  .timegroup{display:inline-flex;align-items:center;gap:8px}
+
+  .nav-row{display:flex;gap:12px;margin-top:26px}
+  .nav-row .btn{flex:1}
+
+  /* ---------- Result ---------- */
+  .result-head{text-align:center;padding:14px 0 8px}
+  .star-wrap{position:relative;width:120px;height:120px;margin:0 auto 6px}
+  .star-wrap svg{width:100%;height:100%;filter:drop-shadow(0 8px 16px rgba(255,197,61,.5))}
+  .score-big{font-family:'Fredoka';font-weight:700;font-size:2.6rem;line-height:1.1}
+  .score-big b{color:var(--grape)}
+  .score-msg{font-weight:700;font-size:1.2rem;margin-top:4px}
+  .score-sub{color:var(--ink-soft);font-weight:500;margin-top:2px}
+
+  .dots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:22px auto 4px;max-width:520px}
+  .dot{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:.9rem;color:#fff;font-weight:700}
+  .dot.ok{background:var(--leaf)}
+  .dot.no{background:var(--coral)}
+
+  .review{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+  .ritem{
+    background:#fff;border-radius:16px;box-shadow:var(--shadow-sm);padding:16px 18px;
+    display:flex;gap:14px;align-items:flex-start;border-left:5px solid var(--leaf);
+  }
+  .ritem.wrong{border-left-color:var(--coral)}
+  .ritem .mark{font-family:'Fredoka';font-weight:700;font-size:1.5rem;flex:none;width:30px;text-align:center;transform:rotate(-8deg)}
+  .ritem.ok .mark{color:var(--leaf)}
+  .ritem.wrong .mark{color:var(--coral)}
+  .ritem .body{flex:1;min-width:0}
+  .ritem .qn{font-size:.74rem;font-weight:700;color:var(--ink-soft);letter-spacing:.5px}
+  .ritem .q{font-size:1.02rem;font-weight:500;margin:2px 0 6px;line-height:1.45}
+  .ritem .ans{font-size:.92rem;font-weight:600}
+  .ritem .ans .you{color:var(--ink-soft)}
+  .ritem .ans .you s{color:var(--coral)}
+  .ritem .ans .right{color:var(--leaf);margin-left:10px}
+
+  .result-cta{display:flex;gap:12px;margin-top:28px}
+  .result-cta .btn{flex:1}
+
+  /* ---------- English preview ---------- */
+  .preview{background:#fff;border-radius:24px;box-shadow:var(--shadow);padding:34px 28px;text-align:center;margin-top:8px}
+  .preview .big{font-size:2.6rem;margin-bottom:8px}
+  .preview h3{font-size:1.3rem;font-weight:700}
+  .preview p{color:var(--ink-soft);font-weight:500;max-width:440px;margin:8px auto 0}
+  .plan{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:520px;margin:24px auto 0;text-align:left}
+  .plan .p{background:var(--paper);border-radius:14px;padding:14px 16px}
+  .plan .p .t{font-weight:700}
+  .plan .p .d{font-size:.8rem;color:var(--ink-soft);font-weight:500;margin-top:2px}
+
+  /* ---------- 獎勵系統 ---------- */
+  .reward-teaser{
+    margin:22px 0 0;padding:18px 20px;border-radius:20px;
+    background:linear-gradient(135deg,#FFF9E6,#FFF0CC);
+    border:2px dashed var(--sun);text-align:center;
+  }
+  .reward-teaser .rt-label{font-size:.78rem;font-weight:700;color:#A07000;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .reward-teaser .rt-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+  .reward-teaser .rt-badge{
+    background:#fff;border-radius:12px;padding:8px 14px;font-weight:700;font-size:.85rem;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;align-items:center;gap:6px;
+  }
+  .reward-teaser p{font-size:.82rem;color:#806000;font-weight:500}
+  .reward-overlay{
+    position:fixed;inset:0;background:rgba(46,49,72,.55);backdrop-filter:blur(6px);
+    display:grid;place-items:center;z-index:999;padding:20px;
+  }
+  .reward-modal{
+    background:#fff;border-radius:28px;padding:0;max-width:520px;width:100%;
+    box-shadow:0 24px 60px rgba(46,49,72,.22);overflow:hidden;position:relative;
+    animation:modalIn .4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes modalIn{from{transform:scale(.7) translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .reward-modal .rm-header{padding:30px 28px 22px;text-align:center;}
+  .reward-modal .rm-firework{font-size:3rem;line-height:1;margin-bottom:8px}
+  .reward-modal .rm-title{font-size:1.45rem;font-weight:700}
+  .reward-modal .rm-sub{font-size:.9rem;color:var(--ink-soft);font-weight:500;margin-top:4px}
+  .coupon{
+    margin:0 22px 22px;border-radius:20px;overflow:hidden;
+    box-shadow:0 8px 24px rgba(0,0,0,.14);position:relative;
+  }
+  .coupon::before,.coupon::after{
+    content:'';position:absolute;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;background:#f5f5f5;z-index:2;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);
+  }
+  .coupon::before{left:-13px;} .coupon::after{right:-13px;}
+  .coupon-top{padding:22px 28px 16px;position:relative;}
+  .coupon-top .ct-label{font-size:.7rem;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-bottom:5px}
+  .coupon-top .ct-title{font-size:1.55rem;font-weight:700;color:#fff;line-height:1.25;max-width:75%}
+  .coupon-top .ct-icon{font-size:2.8rem;position:absolute;right:22px;top:18px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.18))}
+  .coupon-divider{height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.45) 0,rgba(255,255,255,.45) 8px,transparent 8px,transparent 18px);}
+  .coupon-bottom{padding:14px 28px 18px;position:relative;}
+  .coupon-bottom .cb-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:8px}
+  .coupon-bottom .cb-item .cbi-label{font-size:.66rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase}
+  .coupon-bottom .cb-item .cbi-val{font-size:.92rem;font-weight:700;color:#fff;margin-top:1px}
+  .coupon-bottom .cb-note{font-size:.72rem;color:rgba(255,255,255,.6);font-weight:500}
+  .coupon-stamp{
+    position:absolute;right:20px;bottom:12px;
+    width:52px;height:52px;border-radius:50%;
+    border:2.5px solid rgba(255,255,255,.45);
+    display:grid;place-items:center;font-size:1.5rem;
+    background:rgba(255,255,255,.12);
+  }
+  .rm-footer{padding:0 22px 22px;display:flex;flex-direction:column;gap:10px}
+  .rm-print-note{font-size:.75rem;color:var(--ink-soft);text-align:center;font-weight:500}
+  .rm-close{background:none;border:none;font-family:inherit;color:var(--ink-soft);font-size:.86rem;font-weight:600;cursor:pointer;text-align:center;padding:6px;text-decoration:underline}
+  .rm-close:hover{color:var(--ink)}
+  .confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+  .conf{position:absolute;top:-10px;width:10px;height:14px;border-radius:3px;animation:confFall linear forwards}
+  @keyframes confFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+  .hidden{display:none}
+  /* sparkle */
+  .sparkle{position:absolute;font-size:1.2rem;animation:pop 1.1s ease forwards;pointer-events:none}
+  @keyframes pop{0%{transform:translateY(0) scale(0);opacity:0}30%{opacity:1}100%{transform:translateY(-60px) scale(1.2);opacity:0}}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  .foot{text-align:center;color:var(--ink-soft);font-size:.78rem;font-weight:500;margin-top:34px;opacity:.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2 2 0 0 1 6 3.5h11a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-13Z" stroke="#fff" stroke-width="1.7"/><path d="M8 3.5v17" stroke="#fff" stroke-width="1.5"/><path d="M11 8.5h4M11 12h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <h1>暑假練習本</h1>
+        <p>每天練一點，開學沒煩惱</p>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" id="tab-math" onclick="switchSubject('math')">數學</button>
+      <button class="tab" id="tab-eng" onclick="switchSubject('eng')">英文</button>
+    </div>
+  </header>
+
+  <!-- ============ SETUP ============ -->
+  <main id="view-setup">
+    <div class="greet">
+      <h2><span class="wave">👋</span> 嗨！今天想練哪一個單元？</h2>
+      <p>選一個主題，挑好難度和題數，就可以開始囉。</p>
+    </div>
+
+    <div class="section-label">數學單元</div>
+    <div class="topic-grid" id="topic-grid"></div>
+
+    <div class="controls">
+      <div class="ctrl-block">
+        <div class="section-label" style="margin-top:24px">難度</div>
+        <div class="chips" id="diff-chips">
+          <button class="chip" data-diff="1">簡單</button>
+          <button class="chip on" data-diff="2">普通</button>
+          <button class="chip" data-diff="3">挑戰</button>
+        </div>
+      </div>
+      <div class="ctrl-block">
+        <div class="section-label" style="margin-top:24px">題數</div>
+        <div class="chips" id="count-chips">
+          <button class="chip" data-count="5">5 題</button>
+          <button class="chip on" data-count="10">10 題</button>
+          <button class="chip" data-count="20">20 題</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" id="start-btn" onclick="startPractice()">開始練習 ✏️</button>
+    </div>
+  </main>
+
+  <!-- ============ PRACTICE ============ -->
+  <main id="view-practice" class="hidden">
+    <div class="pbar-top">
+      <div class="meta">第 <b id="qnow">1</b> / <span id="qtotal">10</span> 題</div>
+      <div class="topicname" id="ptopic">小數加減</div>
+    </div>
+    <div class="progress"><i id="pfill" style="width:10%"></i></div>
+
+    <div class="qcard">
+      <span class="qtag" id="qtag">小數加減</span>
+      <div class="qtext" id="qtext"></div>
+      <div class="visual" id="qvisual"></div>
+      <div class="answer-area" id="answer-area"></div>
+      <div class="hint" id="qhint"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="prev-btn" onclick="prevQ()">← 上一題</button>
+      <button class="btn btn-primary" id="next-btn" style="width:auto" onclick="nextQ()">下一題 →</button>
+    </div>
+  </main>
+
+  <!-- ============ RESULT ============ -->
+  <main id="view-result" class="hidden">
+    <div class="result-head" id="result-head"></div>
+    <div class="dots" id="dots"></div>
+    <div class="review" id="review"></div>
+    <div class="result-cta">
+      <button class="btn btn-ghost" onclick="backToSetup()">← 換主題</button>
+      <button class="btn btn-primary" style="width:auto" onclick="retrySame()">再做一份 ↻</button>
+    </div>
+  </main>
+
+  <!-- ============ ENGLISH PREVIEW ============ -->
+  <main id="view-eng" class="hidden">
+    <div class="preview">
+      <div class="big">🔤</div>
+      <h3>英文練習，規劃中</h3>
+      <p>英文題目沒辦法像數學一樣用公式自動生成，需要先準備一份校對過的題庫。下面是預計會做的題型：</p>
+      <div class="plan">
+        <div class="p"><div class="t">單字選擇</div><div class="d">看中文選英文，或看圖選字</div></div>
+        <div class="p"><div class="t">克漏字</div><div class="d">句子挖空，從選項補上正確的字</div></div>
+        <div class="p"><div class="t">句子重組</div><div class="d">把打散的單字排成正確句子</div></div>
+        <div class="p"><div class="t">文法選擇</div><div class="d">時態、單複數、介系詞練習</div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ REWARD OVERLAY ============ -->
+  <div id="reward-overlay" class="reward-overlay hidden" onclick="closeReward(event)">
+    <div class="reward-modal" id="reward-modal">
+      <div class="rm-header">
+        <div class="rm-firework" id="rm-firework"></div>
+        <div class="rm-title" id="rm-title"></div>
+        <div class="rm-sub" id="rm-sub"></div>
+      </div>
+      <div class="coupon" id="coupon">
+        <div class="coupon-top" id="coupon-top">
+          <div class="ct-label">🏆 獎勵兌換券</div>
+          <div class="ct-title" id="ct-title"></div>
+          <div class="ct-icon" id="ct-icon"></div>
+        </div>
+        <div class="coupon-divider"></div>
+        <div class="coupon-bottom" id="coupon-bottom">
+          <div class="cb-row" id="cb-row"></div>
+          <div class="cb-note">請出示給爸爸媽媽，由家長確認兌換 ✓</div>
+          <div class="coupon-stamp" id="coupon-stamp"></div>
+        </div>
+      </div>
+      <div class="rm-footer">
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 列印兌換券</button>
+        <button class="rm-close" onclick="closeReward()">先看錯題分析</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">這是互動原型 · 數學題目皆為實際運算產生，可真的作答與批改</div>
+</div>
+
+<script>
+/* =========================================================
+   小工具
+========================================================= */
+const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr=>arr[Math.floor(Math.random()*arr.length)];
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
+function simp(n,d){const g=gcd(n,d);return [n/g,d/g];}
+// 用整數運算避免浮點誤差，回傳乾淨的小數
+function decAdd(a,b,scale){return Math.round(a*scale + b*scale)/scale;}
+function decSub(a,b,scale){return Math.round(a*scale - b*scale)/scale;}
+function trimNum(x){return parseFloat(x.toFixed(6)).toString();}
+
+function fracHTML(n,d){
+  return `<span class="frac"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+}
+function fracText(n,d){
+  // 假分數轉帶分數顯示
+  if(d===1) return `${n}`;
+  if(Math.abs(n)>=d){
+    const w=Math.trunc(n/d), r=Math.abs(n%d);
+    return r===0 ? `${w}` : `${w} ${r}/${d}`;
+  }
+  return `${n}/${d}`;
+}
+
+function cuboidSVG(l,w,h){
+  return `<svg viewBox="0 0 200 160" width="190" height="150" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="40,55 130,55 165,30 75,30" fill="#EEEDFB" stroke="#5A55D6" stroke-width="2"/>
+    <polygon points="40,55 130,55 130,125 40,125" fill="#FFFFFF" stroke="#5A55D6" stroke-width="2"/>
+    <polygon points="130,55 165,30 165,100 130,125" fill="#E4EAFF" stroke="#5A55D6" stroke-width="2"/>
+    <text x="85" y="145" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">長 ${l}</text>
+    <text x="150" y="135" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">寬 ${w}</text>
+    <text x="20" y="95" font-family="Fredoka" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">高 ${h}</text>
+  </svg>`;
+}
+
+/* =========================================================
+   出題器：每個回傳 { tag, html, visual, input, answers, hint, review }
+   input: 'number' | 'fraction' | 'ratio' | 'time'
+========================================================= */
+/* =========================================================
+   出題器（全部重寫 v2）
+========================================================= */
+const GEN = {
+
+  /* ── 1. 小數：乘除運算 ── */
+  decimal(diff){
+    const type = pick(diff===1 ? ['intXdec','intXdec'] : ['intXdec','decXdec','decDivInt']);
+
+    if(type==='intXdec'){
+      // 整數 × 小數
+      const places = diff===1 ? 1 : (diff===2 ? pick([1,2]) : 2);
+      const scale = Math.pow(10,places);
+      const a = rnd(2, diff===1?9:19);
+      const bRaw = rnd(1, scale*(diff===1?9:15));
+      const b = parseFloat((bRaw/scale).toFixed(places));
+      const ans = parseFloat((a*bRaw/scale).toFixed(places));
+      return {
+        tag:'小數', subtype:'整數×小數',
+        html:`<span class="num">${a}</span> × <span class="num">${b}</span> = ？`,
+        input:'number', answers:[trimNum(ans)],
+        hint:'把小數乘法想成先算整數，再把小數點移回去。',
+        review:`${a} × ${b}`
+      };
+    }
+    if(type==='decXdec'){
+      // 小數 × 小數（各一位）
+      const a = rnd(11,99)/10, b = rnd(11,99)/10;
+      const ans = Math.round(a*10*b*10)/100;
+      return {
+        tag:'小數', subtype:'小數×小數',
+        html:`<span class="num">${a.toFixed(1)}</span> × <span class="num">${b.toFixed(1)}</span> = ？`,
+        input:'number', answers:[trimNum(ans)],
+        hint:'兩個小數各有幾位，答案就有幾位小數。',
+        review:`${a.toFixed(1)} × ${b.toFixed(1)}`
+      };
+    }
+    // 小數 ÷ 整數
+    {
+      const divisor = rnd(2, diff===2?9:12);
+      const quot = rnd(1, diff===2?20:40);
+      const places = pick([1,2]);
+      const scale = Math.pow(10,places);
+      // dividend 設計成整除，答案乾淨
+      const dividend = parseFloat((divisor*quot/scale).toFixed(places));
+      return {
+        tag:'小數', subtype:'小數÷整數',
+        html:`<span class="num">${dividend}</span> ÷ <span class="num">${divisor}</span> = ？`,
+        input:'number', answers:[trimNum(quot/scale)],
+        hint:'先算整數除法，再決定小數點的位置。',
+        review:`${dividend} ÷ ${divisor}`
+      };
+    }
+  },
+
+  /* ── 2. 分數：倍與除 ── */
+  fraction(diff){
+    const type = pick(['intFrac','fracFrac','fracDivInt']);
+
+    if(type==='intFrac'){
+      // 整數的分數倍
+      const d = rnd(2,9);
+      // 讓整數是 d 的倍數，答案是整數
+      const mult = rnd(1,6);
+      const whole = d * mult;
+      const n = rnd(1,d-1);
+      const rawNum = whole*n, rawDen = d;
+      const [rn,rd] = simp(rawNum,rawDen);
+      const val = rn/rd;
+      return {
+        tag:'分數', subtype:'整數的分數倍',
+        html:`<span class="num">${whole}</span> 的 ${fracHTML(n,d)} 倍是多少？`,
+        input:'fraction', answers:[val.toFixed(6)], isFrac:true,
+        hint:'整數 × 分數 = 整數 × 分子 ÷ 分母。',
+        review:`${whole} 的 ${n}/${d} 倍`,
+        ansLabel: fracText(rn,rd)
+      };
+    }
+    if(type==='fracFrac'){
+      // 分數的分數倍
+      const d1=rnd(2,8), n1=rnd(1,d1-1);
+      const d2=rnd(2,8), n2=rnd(1,d2-1);
+      const rawNum=n1*n2, rawDen=d1*d2;
+      const [rn,rd]=simp(rawNum,rawDen);
+      return {
+        tag:'分數', subtype:'分數×分數',
+        html:`${fracHTML(n1,d1)} 的 ${fracHTML(n2,d2)} 倍是多少？`,
+        input:'fraction', answers:[(rn/rd).toFixed(6)], isFrac:true,
+        hint:'分數乘分數：分子乘分子、分母乘分母，最後約分。',
+        review:`${n1}/${d1} × ${n2}/${d2}`,
+        ansLabel: fracText(rn,rd)
+      };
+    }
+    // 分數 ÷ 整數
+    {
+      const d=rnd(2,9), n=rnd(1,d-1);
+      const divisor = pick(diff===1?[2,3,4]:diff===2?[2,3,4,5,6]:[2,3,4,5,6,7,8]);
+      const rawDen = d*divisor;
+      const [rn,rd] = simp(n,rawDen);
+      return {
+        tag:'分數', subtype:'分數÷整數',
+        html:`${fracHTML(n,d)} ÷ <span class="num">${divisor}</span> = ？`,
+        input:'fraction', answers:[(rn/rd).toFixed(6)], isFrac:true,
+        hint:'分數除以整數：分母乘以那個整數，分子不變。',
+        review:`${n}/${d} ÷ ${divisor}`,
+        ansLabel: fracText(rn,rd)
+      };
+    }
+  },
+
+  /* ── 3. 體積：含比較與組合 ── */
+  volume(diff){
+    const type = pick(diff===1 ? ['single','single','compare'] : ['single','compare','combine']);
+    const hi = diff===1?8:diff===2?12:16;
+
+    if(type==='single'){
+      const l=rnd(2,hi), w=rnd(2,hi), h=rnd(2,hi);
+      return {
+        tag:'體積', subtype:'基本計算',
+        html:`一個長方體，長 <span class="num">${l}</span> 公分、寬 <span class="num">${w}</span> 公分、高 <span class="num">${h}</span> 公分，體積是多少立方公分？`,
+        visual:cuboidSVG(l,w,h),
+        input:'number', answers:[(l*w*h).toString()], unit:'立方公分',
+        hint:'長方體體積 = 長 × 寬 × 高。',
+        review:`長方體 ${l}×${w}×${h} 體積`
+      };
+    }
+    if(type==='compare'){
+      const l1=rnd(2,hi),w1=rnd(2,hi),h1=rnd(2,hi);
+      const l2=rnd(2,hi),w2=rnd(2,hi),h2=rnd(2,hi);
+      const v1=l1*w1*h1, v2=l2*w2*h2;
+      const diff_=Math.abs(v1-v2);
+      const bigger = v1>v2 ? 'A':'B';
+      return {
+        tag:'體積', subtype:'體積比較',
+        html:`甲箱：長 <span class="num">${l1}</span>、寬 <span class="num">${w1}</span>、高 <span class="num">${h1}</span> 公分。<br>乙箱：長 <span class="num">${l2}</span>、寬 <span class="num">${w2}</span>、高 <span class="num">${h2}</span> 公分。<br>甲箱比乙箱的體積多（或少）多少立方公分？（正數代表甲多，負數代表乙多）`,
+        input:'number', answers:[(v1-v2).toString()], unit:'立方公分',
+        hint:'分別算兩個體積，再相減。甲多就是正數，乙多就填負數。',
+        review:`甲(${l1}×${w1}×${h1}) vs 乙(${l2}×${w2}×${h2})`,
+        ansLabel:`${v1-v2} 立方公分`
+      };
+    }
+    // combine: 挖空（大 - 小）
+    {
+      const L=rnd(6,hi+4), W=rnd(6,hi+4), H=rnd(6,hi+4);
+      const l=rnd(1,Math.floor(L/2)), w=rnd(1,Math.floor(W/2)), h=H; // 挖通孔
+      const ans = L*W*H - l*w*h;
+      return {
+        tag:'體積', subtype:'挖空計算',
+        html:`一個大長方體長 <span class="num">${L}</span>、寬 <span class="num">${W}</span>、高 <span class="num">${H}</span> 公分，<br>從正上方挖去一個長 <span class="num">${l}</span>、寬 <span class="num">${w}</span>、高 <span class="num">${h}</span> 公分的長方體，<br>剩下的體積是多少立方公分？`,
+        input:'number', answers:[ans.toString()], unit:'立方公分',
+        hint:'大體積 − 小體積 = 剩餘體積。',
+        review:`大(${L}×${W}×${H}) − 小(${l}×${w}×${h})`
+      };
+    }
+  },
+
+  /* ── 4. 表面積：含比較與組合 ── */
+  surface(diff){
+    const type = pick(diff===1 ? ['single','single'] : ['single','remove','stack']);
+    const hi = diff===1?8:diff===2?10:14;
+
+    if(type==='single'){
+      const l=rnd(2,hi), w=rnd(2,hi), h=rnd(2,hi);
+      const ans = 2*(l*w+l*h+w*h);
+      return {
+        tag:'表面積', subtype:'基本計算',
+        html:`一個長方體，長 <span class="num">${l}</span>、寬 <span class="num">${w}</span>、高 <span class="num">${h}</span> 公分，表面積是多少平方公分？`,
+        visual:cuboidSVG(l,w,h),
+        input:'number', answers:[ans.toString()], unit:'平方公分',
+        hint:'表面積 = 2×(長×寬 + 長×高 + 寬×高)。',
+        review:`長方體 ${l}×${w}×${h} 表面積`
+      };
+    }
+    if(type==='remove'){
+      // 兩個相同正方體拼在一起，計算合體後表面積
+      const s = rnd(2,hi);
+      // 單個正方體表面積 = 6s²；拼在一起少了兩個 s×s 面
+      const ans = 2*6*s*s - 2*s*s;
+      return {
+        tag:'表面積', subtype:'拼合計算',
+        html:`兩個邊長 <span class="num">${s}</span> 公分的正方體，<br>完全貼合拼在一起後，總表面積是多少平方公分？`,
+        input:'number', answers:[ans.toString()], unit:'平方公分',
+        hint:'先算兩個正方體各自的表面積，拼合處每邊少掉 2 個面。',
+        review:`兩個邊長 ${s} 的正方體拼合`
+      };
+    }
+    // stack: 大減小（上面疊一個）
+    {
+      const L=rnd(6,hi+4), W=rnd(6,hi+4), H1=rnd(2,6);
+      const l=rnd(2,L-2), w=rnd(2,W-2), H2=rnd(2,5);
+      // 底座表面積 + 頂面（底座去掉疊放處）+ 側面 + 小方塊5面
+      const base5 = 2*(L*H1)+2*(W*H1)+L*W; // 底座5面（頂面之後要挖掉 l*w）
+      const topOpen = L*W - l*w;            // 底座頂面扣掉小方塊底部
+      const small5 = 2*(l*H2)+2*(w*H2)+l*w; // 小方塊5面（底面貼著底座）
+      const ans = base5 + topOpen + small5;
+      return {
+        tag:'表面積', subtype:'疊加計算',
+        html:`一個長 <span class="num">${L}</span>、寬 <span class="num">${W}</span>、高 <span class="num">${H1}</span> 公分的底座，<br>上面再疊一個長 <span class="num">${l}</span>、寬 <span class="num">${w}</span>、高 <span class="num">${H2}</span> 公分的小方塊，<br>整體的外表面積是多少平方公分？`,
+        input:'number', answers:[ans.toString()], unit:'平方公分',
+        hint:'底座5面（頂面要扣掉被蓋住的部分）+ 小方塊5面（底面被蓋住不算）。',
+        review:`底座${L}×${W}×${H1} 疊 ${l}×${w}×${H2}`
+      };
+    }
+  },
+
+  /* ── 5. 時間計算 ── */
+  time(diff){
+    const type = pick(diff===1 ? ['elapsed','elapsed'] : ['elapsed','schedule','total']);
+    const f=n=>n.toString().padStart(2,'0');
+
+    if(type==='elapsed'){
+      const h1=rnd(7,18), m1=pick(diff===1?[0,10,15,20,30,40,45]:[0,5,8,12,18,25,35,42,50,55]);
+      const addMin = diff===1?rnd(20,90):diff===2?rnd(30,150):rnd(60,260);
+      const total=h1*60+m1+addMin;
+      const h2=Math.floor(total/60), m2=total%60;
+      const dh=Math.floor(addMin/60), dm=addMin%60;
+      const scenes=[
+        `小明從 <span class="num">${h1}:${f(m1)}</span> 開始看書，到 <span class="num">${h2}:${f(m2)}</span> 才停下來，<br>一共看了多少時間？`,
+        `學校的體育課從 <span class="num">${h1}:${f(m1)}</span> 上到 <span class="num">${h2}:${f(m2)}</span>，<br>這節課有多長？`,
+        `媽媽 <span class="num">${h1}:${f(m1)}</span> 出門，<span class="num">${h2}:${f(m2)}</span> 回家，<br>她出門了多久？`
+      ];
+      return {
+        tag:'時間計算', subtype:'經過時間',
+        html:pick(scenes), input:'time', answers:[{h:dh,m:dm}],
+        hint:'結束時間 − 開始時間，分鐘不夠就向小時借 60 分。',
+        review:`${h1}:${f(m1)} → ${h2}:${f(m2)}`, ansLabel:`${dh} 時 ${dm} 分`
+      };
+    }
+    if(type==='schedule'){
+      // 知道開始和經過，求結束
+      const h1=rnd(7,16), m1=pick([0,10,15,20,30,40,45]);
+      const dh=rnd(0,3), dm=pick([0,10,15,20,25,30,40,45,50]);
+      const addMin=dh*60+dm;
+      if(addMin===0){ return GEN.time(diff); }
+      const total=h1*60+m1+addMin;
+      const h2=Math.floor(total/60), m2=total%60;
+      return {
+        tag:'時間計算', subtype:'推算結束時間',
+        html:`小華 <span class="num">${h1}:${f(m1)}</span> 開始練琴，練了 <span class="num">${dh}</span> 小時 <span class="num">${dm}</span> 分鐘，<br>他幾點練完？`,
+        input:'time', answers:[{h:h2,m:m2}],
+        hint:'把小時和分鐘分別加上去，分鐘超過 60 要進位到小時。',
+        review:`${h1}:${f(m1)} 加 ${dh}時${dm}分`, ansLabel:`${h2}:${f(m2)}`
+      };
+    }
+    // total: 多段時間相加
+    {
+      const seg = rnd(2,3);
+      const parts=[];
+      for(let i=0;i<seg;i++) parts.push({h:rnd(0,2),m:pick([5,10,15,20,25,30])});
+      const totalMin=parts.reduce((s,p)=>s+p.h*60+p.m,0);
+      const rh=Math.floor(totalMin/60), rm=totalMin%60;
+      const desc=parts.map(p=>`<span class="num">${p.h}</span> 小時 <span class="num">${p.m}</span> 分鐘`).join('、');
+      return {
+        tag:'時間計算', subtype:'時間加總',
+        html:`小英今天練習了 ${seg} 項才藝，分別花了 ${desc}，<br>合計練習了多久？`,
+        input:'time', answers:[{h:rh,m:rm}],
+        hint:'分鐘全部加起來，每滿 60 分就換成 1 小時。',
+        review:parts.map(p=>`${p.h}h${p.m}m`).join('+'), ansLabel:`${rh} 時 ${rm} 分`
+      };
+    }
+  },
+
+  /* ── 6. 容積：含物體、外殼扣除 ── */
+  capacity(diff){
+    const type = pick(diff===1
+      ? ['fillBox','waterRise']
+      : ['fillBox','waterRise','shellBox','overflow']);
+
+    if(type==='fillBox'){
+      // 容器能裝多少水（內部尺寸）
+      const l=rnd(5,diff===1?15:25), w=rnd(5,diff===1?15:25), h=rnd(5,diff===1?15:20);
+      return {
+        tag:'容積', subtype:'裝水計算',
+        html:`一個長方形水箱，內部長 <span class="num">${l}</span> 公分、寬 <span class="num">${w}</span> 公分、高 <span class="num">${h}</span> 公分，<br>裝滿水的話，容積是多少毫升？（1 立方公分 = 1 毫升）`,
+        visual:cuboidSVG(l,w,h),
+        input:'number', answers:[(l*w*h).toString()], unit:'毫升',
+        hint:'容積 = 長 × 寬 × 高（用內部尺寸），1 立方公分 = 1 毫升。',
+        review:`水箱 ${l}×${w}×${h} 容積`
+      };
+    }
+    if(type==='waterRise'){
+      // 把物體放進水中，水面上升
+      const L=rnd(10,25), W=rnd(10,25);
+      const ol=rnd(2,Math.floor(L/2)), ow=rnd(2,Math.floor(W/2)), oh=rnd(2,10);
+      const rise = parseFloat((ol*ow*oh/(L*W)).toFixed(2));
+      // 確保答案乾淨
+      if(ol*ow*oh % (L*W) !== 0){
+        // 若不整除就重試一個整除情況
+        const simple_vol = L*W*rnd(1,5);
+        const objH=simple_vol/(L*W);
+        return {
+          tag:'容積', subtype:'水位上升',
+          html:`一個底面長 <span class="num">${L}</span> 公分、寬 <span class="num">${W}</span> 公分的水箱裡，<br>放入一個體積為 <span class="num">${simple_vol}</span> 立方公分的石頭，<br>水面會上升幾公分？`,
+          input:'number', answers:[objH.toString()], unit:'公分',
+          hint:'物體體積 ÷ 底面積 = 水面上升高度。',
+          review:`底${L}×${W}，石頭體積${simple_vol}`
+        };
+      }
+      return {
+        tag:'容積', subtype:'水位上升',
+        html:`一個底面長 <span class="num">${L}</span>、寬 <span class="num">${W}</span> 公分的水箱，<br>放入一個長 <span class="num">${ol}</span>、寬 <span class="num">${ow}</span>、高 <span class="num">${oh}</span> 公分的積木，<br>水面會上升幾公分？`,
+        input:'number', answers:[(ol*ow*oh/(L*W)).toString()], unit:'公分',
+        hint:'積木體積 ÷ 水箱底面積 = 水面上升高度。',
+        review:`水箱底${L}×${W}，積木${ol}×${ow}×${oh}`
+      };
+    }
+    if(type==='shellBox'){
+      // 外殼厚度：外部尺寸 - 2×厚度 = 內部
+      const thick = pick([1,2]);
+      const outL=rnd(10,25), outW=rnd(10,25), outH=rnd(8,20);
+      const inL=outL-2*thick, inW=outW-2*thick, inH=outH-thick; // 底有厚度，頂開口
+      const vol=inL*inW*inH;
+      return {
+        tag:'容積', subtype:'扣除外殼',
+        html:`一個開口長方形盒子，外部長 <span class="num">${outL}</span>、寬 <span class="num">${outW}</span>、高 <span class="num">${outH}</span> 公分，<br>盒壁與底部厚度都是 <span class="num">${thick}</span> 公分（頂部開口），<br>這個盒子的容積是多少立方公分？`,
+        input:'number', answers:[vol.toString()], unit:'立方公分',
+        hint:'內部尺寸 = 外部尺寸 − 2×壁厚（左右各一），高度只扣底部一層。',
+        review:`外${outL}×${outW}×${outH}，壁厚${thick}`
+      };
+    }
+    // overflow: 水倒入太滿，溢出多少
+    {
+      const l=rnd(8,20), w=rnd(8,20), h=rnd(8,18);
+      const cap=l*w*h;
+      const over=rnd(1,5)*(l*w); // 整除讓高度是整數
+      return {
+        tag:'容積', subtype:'溢出計算',
+        html:`一個長 <span class="num">${l}</span>、寬 <span class="num">${w}</span>、高 <span class="num">${h}</span> 公分的水桶（無蓋），<br>裡面已經裝了 <span class="num">${cap+over}</span> 毫升的水，<br>會溢出多少毫升？`,
+        input:'number', answers:[over.toString()], unit:'毫升',
+        hint:'先算水桶容積，再用總水量減掉容積，就是溢出的量。',
+        review:`桶${l}×${w}×${h}，水${cap+over}mL`
+      };
+    }
+  },
+
+  /* ── 7. 比例：含生活情境 ── */
+  ratio(diff){
+    const type = pick(diff===1
+      ? ['simplify','simplify','life']
+      : ['simplify','life','share','missing']);
+
+    if(type==='simplify'){
+      let p,q;
+      do{ p=rnd(1,9); q=rnd(1,9);}while(gcd(p,q)!==1 || p===q);
+      const k=diff===1?rnd(2,4):rnd(2,8);
+      const a=p*k, b=q*k;
+      return {
+        tag:'比例', subtype:'化最簡比',
+        html:`把 <span class="num">${a} : ${b}</span> 化成最簡單的整數比。`,
+        input:'ratio', answers:[`${p}:${q}`],
+        hint:'找出最大公因數，分別除掉就好。',
+        review:`${a} : ${b}`, ansLabel:`${p} : ${q}`
+      };
+    }
+    if(type==='life'){
+      const scenes=[
+        ()=>{
+          const boys=rnd(2,7)*3, girls=rnd(2,7)*4;
+          const [p,q]=simp(boys,girls);
+          return {
+            html:`班上有男生 <span class="num">${boys}</span> 人，女生 <span class="num">${girls}</span> 人，<br>男生與女生的人數比（最簡）是多少？`,
+            ans:`${p}:${q}`, review:`男${boys}:女${girls}`, label:`${p} : ${q}`,
+            hint:'把男生人數和女生人數寫成比，再化最簡。'
+          };
+        },
+        ()=>{
+          let j=rnd(1,4),w=rnd(1,4); if(j===w)w++;
+          const k=rnd(2,5), jml=j*k*100, wml=w*k*100;
+          const [p,q]=simp(j,w);
+          return {
+            html:`一杯果汁飲料，果汁 <span class="num">${jml}</span> 毫升，水 <span class="num">${wml}</span> 毫升，<br>果汁與水的比（最簡）是多少？`,
+            ans:`${p}:${q}`, review:`果汁${jml}:水${wml}`, label:`${p} : ${q}`,
+            hint:'果汁:水，化最簡整數比。'
+          };
+        },
+        ()=>{
+          const red=rnd(2,5)*6, blue=rnd(2,5)*4;
+          const [p,q]=simp(red,blue);
+          return {
+            html:`籃子裡有紅球 <span class="num">${red}</span> 顆、藍球 <span class="num">${blue}</span> 顆，<br>紅球與藍球的比（最簡）是多少？`,
+            ans:`${p}:${q}`, review:`紅${red}:藍${blue}`, label:`${p} : ${q}`,
+            hint:'數量比，化最簡整數比。'
+          };
+        }
+      ];
+      const sc=pick(scenes)();
+      return {
+        tag:'比例', subtype:'生活應用',
+        html:sc.html, input:'ratio', answers:[sc.ans],
+        hint:sc.hint, review:sc.review, ansLabel:sc.label
+      };
+    }
+    if(type==='share'){
+      // 按比例分配
+      let p,q;
+      do{ p=rnd(1,6); q=rnd(1,6);}while(p===q);
+      const total=(p+q)*rnd(2,8);
+      const shareA=total*p/(p+q);
+      return {
+        tag:'比例', subtype:'按比例分配',
+        html:`哥哥和妹妹按照 <span class="num">${p} : ${q}</span> 的比例分 <span class="num">${total}</span> 顆糖，<br>哥哥可以得到幾顆？`,
+        input:'number', answers:[shareA.toString()], unit:'顆',
+        hint:`總份數 = ${p}+${q}，哥哥佔 ${p} 份：${total} ÷ ${p+q} × ${p}。`,
+        review:`${total} 顆按 ${p}:${q} 分，求大份`
+      };
+    }
+    // missing: 找第四比例項
+    {
+      let p,q;
+      do{ p=rnd(2,8); q=rnd(2,8);}while(p===q);
+      const k=rnd(2,6);
+      const a=p*k, b=q*k;
+      const ask=pick(['c','d']);
+      if(ask==='c'){
+        const newD=rnd(2,5)*(q);
+        const newC=p*(newD/q);
+        return {
+          tag:'比例', subtype:'求比例項',
+          html:`<span class="num">${a} : ${b} = ？ : ${newD}</span>，問號是多少？`,
+          input:'number', answers:[newC.toString()],
+          hint:'比例的前項或後項乘以同一個數，比值不變。',
+          review:`${a}:${b} = ?:${newD}`
+        };
+      } else {
+        const newC=rnd(2,5)*(p);
+        const newD=q*(newC/p);
+        return {
+          tag:'比例', subtype:'求比例項',
+          html:`<span class="num">${a} : ${b} = ${newC} : ？</span>，問號是多少？`,
+          input:'number', answers:[newD.toString()],
+          hint:'前項乘以幾，後項也要乘以同一個數。',
+          review:`${a}:${b} = ${newC}:?`
+        };
+      }
+    }
+  },
+
+  /* ── 8. 百分率：含生活情境 ── */
+  percent(diff){
+    const type = pick(diff===1
+      ? ['ofWhole','whichPct']
+      : ['ofWhole','whichPct','discount','survey','change']);
+
+    const nicePct=[10,20,25,40,50,60,75,80];
+
+    if(type==='ofWhole'){
+      const p=pick(nicePct);
+      const whole=rnd(2,diff===3?50:20)*(diff===1?10:5);
+      const ans=whole*p/100;
+      return {
+        tag:'百分率', subtype:'求幾%是多少',
+        html:`全班 <span class="num">${whole}</span> 位同學中，有 <span class="num">${p}%</span> 的同學喜歡數學，<br>喜歡數學的有幾位？`,
+        input:'number', answers:[trimNum(ans)], unit:'位',
+        hint:'全體人數 × 百分率（先÷100）= 部分人數。',
+        review:`${whole} 的 ${p}%`
+      };
+    }
+    if(type==='whichPct'){
+      const p=pick(nicePct), whole=rnd(2,20)*5, part=whole*p/100;
+      return {
+        tag:'百分率', subtype:'求百分之幾',
+        html:`班上 <span class="num">${whole}</span> 人參加運動會，其中 <span class="num">${part}</span> 人參加跑步，<br>參加跑步的人占全班的百分之幾？`,
+        input:'number', answers:[p.toString()], unit:'%',
+        hint:'部分 ÷ 全部 × 100% = 百分率。',
+        review:`${part} / ${whole} = ?%`
+      };
+    }
+    if(type==='discount'){
+      // 打折
+      const orig=pick([100,150,200,250,300,400,500])*rnd(1,4);
+      const discount=pick([60,70,75,80,90]); // 幾折（百分比）
+      const ans=orig*discount/100;
+      return {
+        tag:'百分率', subtype:'打折計算',
+        html:`一件衣服原價 <span class="num">${orig}</span> 元，現在打 <span class="num">${discount}%</span> 的折扣，<br>要付多少錢？`,
+        input:'number', answers:[trimNum(ans)], unit:'元',
+        hint:'打折後售價 = 原價 × 折扣百分率。',
+        review:`${orig} 元打 ${discount}%`
+      };
+    }
+    if(type==='survey'){
+      // 給百分率求人數，或反過來
+      const total=pick([20,25,40,50])*rnd(1,3);
+      const p=pick(nicePct);
+      const part=total*p/100;
+      const q2=pick(['seek_part','seek_pct']);
+      if(q2==='seek_part'){
+        return {
+          tag:'百分率', subtype:'生活調查',
+          html:`學校調查 <span class="num">${total}</span> 名學生，結果有 <span class="num">${p}%</span> 的人每天吃早餐，<br>每天吃早餐的有幾人？`,
+          input:'number', answers:[trimNum(part)], unit:'人',
+          hint:'總人數 × 百分率 = 人數。',
+          review:`${total} 人中 ${p}%`
+        };
+      } else {
+        return {
+          tag:'百分率', subtype:'生活調查',
+          html:`學校調查 <span class="num">${total}</span> 名學生，其中 <span class="num">${part}</span> 人有帶水壺上學，<br>帶水壺的比例是百分之幾？`,
+          input:'number', answers:[p.toString()], unit:'%',
+          hint:'部分 ÷ 全體 × 100。',
+          review:`${part}/${total} = ?%`
+        };
+      }
+    }
+    // change: 成長/減少百分比
+    {
+      const orig=rnd(2,20)*50;
+      const p=pick([10,20,25,50]);
+      const dir=pick(['up','down']);
+      const change=orig*p/100;
+      const ans=dir==='up'?orig+change:orig-change;
+      return {
+        tag:'百分率', subtype:'增減計算',
+        html:`去年班上有 <span class="num">${orig}</span> 本課外書，今年${dir==='up'?'增加':'減少'}了 <span class="num">${p}%</span>，<br>今年有幾本？`,
+        input:'number', answers:[trimNum(ans)], unit:'本',
+        hint:`今年 = 去年 ${dir==='up'?'×(1+':'×(1−'}${p/100})。`,
+        review:`${orig} ${dir==='up'?'+':'-'} ${p}%`
+      };
+    }
+  }
+};
+
+const DIFF_LABEL = {1:'簡單',2:'普通',3:'挑戰'};
+
+const TOPICS = [
+  {key:'decimal',  ico:'🔢', nm:'小數',     ds:'乘法與除法'},
+  {key:'fraction', ico:'🍕', nm:'分數',     ds:'倍數與除法'},
+  {key:'volume',   ico:'📦', nm:'體積',     ds:'計算與比較'},
+  {key:'surface',  ico:'🎁', nm:'表面積',   ds:'拼合與疊加'},
+  {key:'time',     ico:'⏰', nm:'時間計算', ds:'時分換算'},
+  {key:'capacity', ico:'🧃', nm:'容積',     ds:'裝水與溢出'},
+  {key:'ratio',    ico:'⚖️', nm:'比例',     ds:'生活應用'},
+  {key:'percent',  ico:'💯', nm:'百分率',   ds:'折扣與調查'},
+];
+
+/* =========================================================
+   狀態
+========================================================= */
+let state = { topic:'decimal', diff:2, count:10, questions:[], answers:[], idx:0 };
+
+/* ---- 渲染主題卡 ---- */
+function renderTopics(){
+  const g=document.getElementById('topic-grid');
+  g.innerHTML='';
+  TOPICS.forEach(t=>{
+    const el=document.createElement('button');
+    el.className='topic'+(t.key===state.topic?' sel':'');
+    el.innerHTML=`<div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="ico">${t.ico}</span><span class="nm">${t.nm}</span><span class="ds">${t.ds}</span>`;
+    el.onclick=()=>{state.topic=t.key;renderTopics();};
+    g.appendChild(el);
+  });
+}
+renderTopics();
+
+document.getElementById('diff-chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b)return;
+  state.diff=+b.dataset.diff;
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('on',c===b));
+});
+document.getElementById('count-chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b)return;
+  state.count=+b.dataset.count;
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('on',c===b));
+});
+
+/* =========================================================
+   開始練習
+========================================================= */
+function startPractice(){
+  state.questions=[]; state.answers=[]; state.idx=0;
+  for(let i=0;i<state.count;i++){
+    state.questions.push(GEN[state.topic](state.diff));
+    state.answers.push(null);
+  }
+  show('practice');
+  document.getElementById('qtotal').textContent=state.count;
+  renderQ();
+}
+
+function renderQ(){
+  const q=state.questions[state.idx];
+  const saved=state.answers[state.idx];
+  document.getElementById('qnow').textContent=state.idx+1;
+  document.getElementById('pfill').style.width=((state.idx+1)/state.count*100)+'%';
+  document.getElementById('ptopic').textContent=q.tag;
+  document.getElementById('qtag').textContent=q.tag;
+  document.getElementById('qtext').innerHTML=q.html;
+  document.getElementById('qvisual').innerHTML=q.visual||'';
+  document.getElementById('qhint').textContent=q.hint||'';
+
+  const area=document.getElementById('answer-area');
+  if(q.input==='time'){
+    area.innerHTML=`<span class="lab">答案</span>
+      <span class="timegroup">
+        <input class="field small" id="ans-h" inputmode="numeric" value="${saved?saved.h:''}"> <span class="unit">時</span>
+        <input class="field small" id="ans-m" inputmode="numeric" value="${saved?saved.m:''}"> <span class="unit">分</span>
+      </span>`;
+  } else {
+    const ph = q.input==='fraction' ? '例：3/4' : q.input==='ratio' ? '例：2:3' : '';
+    area.innerHTML=`<span class="lab">答案</span>
+      <input class="field" id="ans-main" inputmode="${q.input==='number'?'decimal':'text'}" placeholder="${ph}" value="${saved!=null?saved:''}">
+      ${q.unit?`<span class="unit">${q.unit}</span>`:''}`;
+  }
+  // nav 狀態
+  document.getElementById('prev-btn').disabled = state.idx===0;
+  const isLast = state.idx===state.count-1;
+  const nb=document.getElementById('next-btn');
+  nb.textContent = isLast ? '完成，對答案 ✓' : '下一題 →';
+  // Enter 快速下一題
+  const main=document.getElementById('ans-main');
+  if(main){ main.focus(); main.onkeydown=e=>{if(e.key==='Enter')nextQ();}; }
+}
+
+function saveCurrent(){
+  const q=state.questions[state.idx];
+  if(q.input==='time'){
+    const h=document.getElementById('ans-h').value.trim();
+    const m=document.getElementById('ans-m').value.trim();
+    state.answers[state.idx]=(h===''&&m==='')?null:{h,m};
+  } else {
+    const v=document.getElementById('ans-main').value.trim();
+    state.answers[state.idx]= v===''?null:v;
+  }
+}
+
+function nextQ(){
+  saveCurrent();
+  if(state.idx===state.count-1){ finish(); return; }
+  state.idx++; renderQ();
+}
+function prevQ(){ saveCurrent(); if(state.idx>0){state.idx--;renderQ();} }
+
+/* =========================================================
+   批改
+========================================================= */
+function parseFrac(str){
+  str=str.replace(/\s+/g,' ').trim();
+  let m;
+  if((m=str.match(/^(-?\d+)\s+(\d+)\/(\d+)$/))){const w=+m[1],n=+m[2],d=+m[3];if(!d)return null;const s=w<0?-1:1;return s*(Math.abs(w)*d+n)/d;}
+  if((m=str.match(/^(-?\d+)\/(\d+)$/))){const n=+m[1],d=+m[2];if(!d)return null;return n/d;}
+  if((m=str.match(/^-?\d*\.?\d+$/))) return parseFloat(str);
+  return null;
+}
+function normRatio(str){
+  const parts=str.replace(/：/g,':').split(':').map(s=>s.trim());
+  if(parts.length!==2)return null;
+  const a=+parts[0], b=+parts[1];
+  if(!Number.isFinite(a)||!Number.isFinite(b)||b===0)return null;
+  const [p,q]=simp(a,b); return p+':'+q;
+}
+function checkOne(q,ans){
+  if(ans==null)return false;
+  if(q.input==='time'){
+    return (+ans.h||0)===q.answers[0].h && (+ans.m||0)===q.answers[0].m;
+  }
+  if(q.input==='ratio'){
+    const u=normRatio(ans); return u!==null && u===q.answers[0];
+  }
+  if(q.isFrac){
+    const v=parseFrac(ans); if(v===null)return false;
+    return Math.abs(v-parseFloat(q.answers[0]))<1e-4;
+  }
+  // number
+  const v=parseFloat(ans); if(!Number.isFinite(v))return false;
+  return Math.abs(v-parseFloat(q.answers[0]))<1e-6;
+}
+function ansLabel(q){
+  if(q.ansLabel) return q.ansLabel;
+  return q.answers[0]+(q.unit?(' '+q.unit):'');
+}
+function yourLabel(q,ans){
+  if(ans==null)return '未作答';
+  if(q.input==='time')return `${ans.h||0} 時 ${ans.m||0} 分`;
+  return ans+(q.unit?(' '+q.unit):'');
+}
+
+/* =========================================================
+   獎勵系統設定
+========================================================= */
+const REWARDS = {
+  1: {
+    grade:'🟢 簡單',
+    color:['#2FBF71','#1A9E57'],
+    prizes:[
+      {icon:'🍬', name:'便利商店糖果一包'},
+      {icon:'🧋', name:'手搖飲料一杯'},
+      {icon:'🍩', name:'甜甜圈一個'},
+      {icon:'🍫', name:'巧克力棒一條'},
+    ]
+  },
+  2: {
+    grade:'🟡 普通',
+    color:['#F59E0B','#D97706'],
+    prizes:[
+      {icon:'🎮', name:'打電動 30 分鐘'},
+      {icon:'🍕', name:'選一家餐廳吃飯'},
+      {icon:'🎬', name:'看一部想看的電影'},
+      {icon:'🛍️', name:'文具或小玩具一個'},
+    ]
+  },
+  3: {
+    grade:'🔴 挑戰',
+    color:['#EF4444','#B91C1C'],
+    prizes:[
+      {icon:'🎡', name:'出去玩一天（你選地點）'},
+      {icon:'🎮', name:'打電動整個下午'},
+      {icon:'🎁', name:'自選一個禮物'},
+      {icon:'🏊', name:'去泳池或遊樂場'},
+    ]
+  }
+};
+
+function finish(){
+  let correct=0;
+  const results=state.questions.map((q,i)=>{
+    const ok=checkOne(q,state.answers[i]); if(ok)correct++;
+    return {q,ok,ans:state.answers[i]};
+  });
+  show('result');
+  const pct=Math.round(correct/state.count*100);
+  const isPerfect = correct===state.count && state.count===20;
+
+  let msg,sub,starFill;
+  if(pct===100){
+    msg = isPerfect ? '🎊 20 題全部答對！！' : '全部答對！太厲害了 🎉';
+    sub = isPerfect ? '恭喜解鎖獎勵兌換券！' : '你已經完全掌握這個單元了';
+    starFill=1;
+  }
+  else if(pct>=80){msg='做得很好！';sub='只差一點點就滿分囉';starFill=.82;}
+  else if(pct>=60){msg='不錯喔，繼續加油！';sub='把錯的題目再看一次會更好';starFill=.6;}
+  else {msg='再練習幾次就會更熟！';sub='別灰心，錯的地方就是進步的地方';starFill=.4;}
+
+  const topicName = TOPICS.find(t=>t.key===state.topic)?.nm || '';
+  const diffColor = state.diff===1?'var(--leaf-tint)':state.diff===2?'#FFF6E0':'var(--coral-tint)';
+  const diffTextColor = state.diff===1?'var(--leaf)':state.diff===2?'#B07D00':'var(--coral)';
+  const diffEmoji = state.diff===1?'🟢':state.diff===2?'🟡':'🔴';
+
+  const teaserHtml = !isPerfect && state.count===20 ? `
+    <div class="reward-teaser">
+      <div class="rt-label">🏆 獎勵解鎖條件</div>
+      <div class="rt-row">
+        <div class="rt-badge">🟢 簡單全對 → 🍬 便利商店</div>
+        <div class="rt-badge">🟡 普通全對 → 🎮 打電動</div>
+        <div class="rt-badge">🔴 挑戰全對 → 🎡 出去玩</div>
+      </div>
+      <p>20 題全部答對才能兌換！加油，下次一定可以 💪</p>
+    </div>` : !isPerfect && state.count!==20 ? `
+    <div class="reward-teaser">
+      <div class="rt-label">🏆 想解鎖獎勵？</div>
+      <p>選擇 <b>20 題</b>並且全部答對，就可以兌換獎勵喔！</p>
+    </div>` : '';
+
+  document.getElementById('result-head').innerHTML=`
+    <div class="star-wrap">${starSVG(starFill)}</div>
+    <div class="score-big">答對 <b>${correct}</b> / ${state.count}</div>
+    <div class="score-msg">${msg}</div>
+    <div class="score-sub">${sub}</div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <span style="background:var(--grape-tint);color:var(--grape);font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:99px">📘 ${topicName}</span>
+      <span style="background:${diffColor};color:${diffTextColor};font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:99px">${diffEmoji} 難度：${DIFF_LABEL[state.diff]}</span>
+      <span style="background:#F0F0F0;color:var(--ink-soft);font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:99px">📝 共 ${state.count} 題</span>
+    </div>
+    ${teaserHtml}`;
+
+  document.getElementById('dots').innerHTML=results.map(r=>
+    `<div class="dot ${r.ok?'ok':'no'}">${r.ok?'✓':'✕'}</div>`).join('');
+
+  document.getElementById('review').innerHTML=results.map((r,i)=>{
+    const wrong=!r.ok;
+    return `<div class="ritem ${wrong?'wrong':'ok'}">
+      <div class="mark">${wrong?'✕':'○'}</div>
+      <div class="body">
+        <div class="qn">第 ${i+1} 題 · ${r.q.tag}</div>
+        <div class="q">${r.q.review}</div>
+        <div class="ans">
+          <span class="you">你的答案：${wrong?`<s>${yourLabel(r.q,r.ans)}</s>`:yourLabel(r.q,r.ans)}</span>
+          ${wrong?`<span class="right">正解：${ansLabel(r.q)}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if(pct>=80 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) sprinkle();
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  if(isPerfect){ setTimeout(()=>showReward(), 900); }
+}
+
+/* =========================================================
+   獎勵 Modal 函式
+========================================================= */
+function showReward(){
+  const rw = REWARDS[state.diff];
+  const prize = rw.prizes[Math.floor(Math.random()*rw.prizes.length)];
+  const topicName = TOPICS.find(t=>t.key===state.topic)?.nm || '';
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
+  const [c1,c2] = rw.color;
+  const gradStyle = `background:linear-gradient(135deg,${c1},${c2})`;
+
+  document.getElementById('rm-firework').textContent = state.diff===1?'🎉':state.diff===2?'🥳':'🎊';
+  document.getElementById('rm-title').textContent = '獎勵兌換券解鎖！';
+  document.getElementById('rm-sub').textContent = `${rw.grade}・20 題全部答對，你太厲害了！`;
+
+  document.getElementById('coupon-top').setAttribute('style', gradStyle);
+  document.getElementById('coupon-bottom').setAttribute('style', gradStyle);
+  document.getElementById('ct-title').textContent = prize.name;
+  document.getElementById('ct-icon').textContent = prize.icon;
+  document.getElementById('coupon-stamp').textContent = prize.icon;
+
+  document.getElementById('cb-row').innerHTML = `
+    <div class="cb-item"><div class="cbi-label">單元</div><div class="cbi-val">${topicName}</div></div>
+    <div class="cb-item"><div class="cbi-label">難度</div><div class="cbi-val">${rw.grade}</div></div>
+    <div class="cb-item"><div class="cbi-label">日期</div><div class="cbi-val">${dateStr}</div></div>`;
+
+  document.getElementById('reward-overlay').classList.remove('hidden');
+  launchConfetti(c1);
+}
+
+function closeReward(e){
+  if(e && e.target !== document.getElementById('reward-overlay')) return;
+  document.getElementById('reward-overlay').classList.add('hidden');
+  document.querySelectorAll('.confetti-wrap').forEach(el=>el.remove());
+}
+
+function launchConfetti(baseColor){
+  const wrap = document.createElement('div');
+  wrap.className='confetti-wrap';
+  document.body.appendChild(wrap);
+  const colors=['#FFC53D','#5A55D6','#2FBF71','#F26D6D','#FF9A52','#fff',baseColor];
+  for(let i=0;i<90;i++){
+    const c=document.createElement('div');
+    c.className='conf';
+    const sz = 6+Math.random()*8;
+    c.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${sz}px;height:${sz+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'3px'};animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*1.2}s;opacity:${0.7+Math.random()*.3}`;
+    wrap.appendChild(c);
+  }
+  setTimeout(()=>wrap.remove(), 5000);
+}
+function starSVG(fill){
+  const id='g'+Math.random().toString(36).slice(2);
+  const y=100-fill*100;
+  return `<svg viewBox="0 0 100 100"><defs>
+    <linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="${y}%" stop-color="#E7E6F2"/><stop offset="${y}%" stop-color="#FFC53D"/>
+    </linearGradient></defs>
+    <path d="M50 6l13 27 29 4-21 21 5 29-26-14-26 14 5-29-21-21 29-4z" fill="url(#${id})" stroke="#FFB020" stroke-width="2" stroke-linejoin="round"/>
+  </svg>`;
+}
+function sprinkle(){
+  const head=document.getElementById('result-head');
+  const em=['⭐','🎉','✨','🌟','🎊'];
+  for(let i=0;i<14;i++){
+    const s=document.createElement('span');
+    s.className='sparkle'; s.textContent=pick(em);
+    s.style.left=rnd(5,90)+'%'; s.style.top=rnd(10,60)+'%';
+    s.style.animationDelay=(Math.random()*0.5)+'s';
+    head.appendChild(s); setTimeout(()=>s.remove(),1600);
+  }
+}
+
+/* =========================================================
+   視圖切換
+========================================================= */
+function show(v){
+  ['setup','practice','result','eng'].forEach(x=>
+    document.getElementById('view-'+x).classList.toggle('hidden',x!==v));
+}
+function backToSetup(){ show('setup'); switchSubject('math',true); }
+function retrySame(){ startPractice(); }
+
+function switchSubject(s, silent){
+  document.getElementById('tab-math').classList.toggle('on',s==='math');
+  document.getElementById('tab-eng').classList.toggle('on',s==='eng');
+  if(s==='eng'){ show('eng'); }
+  else if(!silent){ show('setup'); }
+}
+</script>
+</body>
+</html>
