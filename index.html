@@ -147,6 +147,9 @@
   .unit{font-weight:600;font-size:1.05rem;color:var(--ink-soft)}
   .hint{font-size:.82rem;color:var(--ink-soft);font-weight:500;margin-top:10px}
   .timegroup{display:inline-flex;align-items:center;gap:8px}
+  .opts{display:flex;gap:10px;flex-wrap:wrap}
+  .opts .chip{font-size:1.15rem;padding:10px 20px;min-width:72px}
+  .opts .chip .frac .d{border-top-color:currentColor}
 
   .nav-row{display:flex;gap:12px;margin-top:26px}
   .nav-row .btn{flex:1}
@@ -294,6 +297,12 @@
       <p>選一個主題，挑好難度和題數，就可以開始囉。</p>
     </div>
 
+    <div class="section-label">年級</div>
+    <div class="chips" id="grade-chips">
+      <button class="chip on" data-grade="5">五年級</button>
+      <button class="chip" data-grade="6">六年級</button>
+    </div>
+
     <div class="section-label">數學單元</div>
     <div class="topic-grid" id="topic-grid"></div>
 
@@ -412,6 +421,18 @@ function simp(n,d){const g=gcd(n,d);return [n/g,d/g];}
 function decAdd(a,b,scale){return Math.round(a*scale + b*scale)/scale;}
 function decSub(a,b,scale){return Math.round(a*scale - b*scale)/scale;}
 function trimNum(x){return parseFloat(x.toFixed(6)).toString();}
+function lcm(a,b){return a/gcd(a,b)*b;}
+function isPrime(n){if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+// 兩個不相等且互質的數
+function coprimePair(lo,hi){let p,q;do{p=rnd(lo,hi);q=rnd(lo,hi);}while(p===q||gcd(p,q)!==1);return [p,q];}
+const N = x=>`<span class="num">${x}</span>`;
+// 分數答案的共用欄位
+function fracAns(n,d){
+  const [rn,rd]=simp(n,d);
+  return {input:'fraction', isFrac:true, answers:[(rn/rd).toFixed(6)], ansLabel:fracText(rn,rd)};
+}
+function fracDisp(n,d){const [rn,rd]=simp(n,d);return rd===1?N(rn):fracHTML(rn,rd);}
 
 function fracHTML(n,d){
   return `<span class="frac"><span class="n">${n}</span><span class="d">${d}</span></span>`;
@@ -434,6 +455,29 @@ function cuboidSVG(l,w,h){
     <text x="85" y="145" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">長 ${l}</text>
     <text x="150" y="135" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">寬 ${w}</text>
     <text x="20" y="95" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">高 ${h}</text>
+  </svg>`;
+}
+
+function circleSVG(label, isRadius){
+  const line = isRadius
+    ? '<line x1="100" y1="78" x2="162" y2="78" stroke="#F26D6D" stroke-width="2.5"/>'
+    : '<line x1="38" y1="78" x2="162" y2="78" stroke="#F26D6D" stroke-width="2.5"/>';
+  return `<svg viewBox="0 0 200 170" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="78" r="62" fill="#EEEDFB" stroke="#5A55D6" stroke-width="2"/>
+    ${line}
+    <circle cx="100" cy="78" r="3.5" fill="#5A55D6"/>
+    <text x="100" y="164" font-family="-apple-system, PingFang TC, system-ui" font-size="15" font-weight="600" fill="#5A55D6" text-anchor="middle">${label}</text>
+  </svg>`;
+}
+
+function sectorSVG(deg, r){
+  const cx=100, cy=85, R=62, t=deg*Math.PI/180;
+  const ex=(cx+R*Math.cos(t)).toFixed(1), ey=(cy-R*Math.sin(t)).toFixed(1);
+  const lx=(cx+24*Math.cos(t/2)).toFixed(1), ly=(cy-24*Math.sin(t/2)+5).toFixed(1);
+  return `<svg viewBox="0 0 200 170" width="190" height="160" xmlns="http://www.w3.org/2000/svg">
+    <path d="M${cx} ${cy} L${cx+R} ${cy} A${R} ${R} 0 ${deg>180?1:0} 0 ${ex} ${ey} Z" fill="#EEEDFB" stroke="#5A55D6" stroke-width="2" stroke-linejoin="round"/>
+    <text x="${cx+R/2}" y="${cy+18}" font-family="-apple-system, PingFang TC, system-ui" font-size="14" font-weight="600" fill="#5A55D6" text-anchor="middle">${r} 公分</text>
+    <text x="${lx}" y="${ly}" font-family="-apple-system, PingFang TC, system-ui" font-size="13" font-weight="700" fill="#F26D6D" text-anchor="middle">${deg}°</text>
   </svg>`;
 }
 
@@ -960,32 +1004,795 @@ const GEN = {
         review:`${orig} ${dir==='up'?'+':'-'} ${p}%`
       };
     }
+  },
+
+  /* =================== 六年級 =================== */
+
+  /* ── 6-1. 最大公因數與最小公倍數 ── */
+  factor(diff){
+    const type = pick(diff===1
+      ? ['primeOrNot','findPrime','gcd','lcm']
+      : ['primeOrNot','findPrime','primeCount','gcd','lcm','gcdApp','lcmApp']);
+    const hi = diff===1?30:diff===2?60:100;
+
+    if(type==='primeOrNot'){
+      let n;
+      if(pick([true,false])){ do{ n=rnd(2,hi); }while(!isPrime(n)); }
+      // 普通以上出「看起來像質數」的奇合數（如 51、91）
+      else { do{ n=rnd(4,hi); }while(isPrime(n) || (diff>1 && (n%2===0||n%5===0))); }
+      return {
+        tag:'質數與合數', subtype:'判斷質數',
+        html:`${N(n)} 是質數還是合數？`,
+        input:'choice', options:['質數','合數'], answers:[isPrime(n)?'質數':'合數'],
+        hint:'質數只有 1 和自己兩個因數；合數除了 1 和自己，還有別的因數。',
+        review:`${n} 是質數還是合數`
+      };
+    }
+    if(type==='findPrime'){
+      const primes=[], comps=[];
+      for(let n=2;n<=hi;n++){
+        if(isPrime(n)) primes.push(n);
+        else if(diff===1 || (n%2 && n%5)) comps.push(n);
+      }
+      const p=pick(primes);
+      const opts=shuffle([p,...shuffle(comps).slice(0,3)]).map(String);
+      return {
+        tag:'質數與合數', subtype:'找質數',
+        html:`下面哪一個數是<b>質數</b>？`,
+        input:'choice', options:opts, answers:[String(p)],
+        hint:'用 2、3、5、7 試著去除，除得盡的就是合數。',
+        review:`${opts.join('、')} 中的質數`
+      };
+    }
+    if(type==='primeCount'){
+      const top=pick(diff===2?[20,30,40]:[50,60,70]);
+      let cnt=0; for(let n=2;n<=top;n++) if(isPrime(n)) cnt++;
+      return {
+        tag:'質數與合數', subtype:'質數個數',
+        html:`1 到 ${N(top)} 之間，一共有幾個質數？`,
+        input:'number', answers:[String(cnt)], unit:'個',
+        hint:'1 不是質數也不是合數；把 2、3、5、7 的倍數（本身除外）刪掉，剩下的就是質數。',
+        review:`1～${top} 的質數個數`
+      };
+    }
+    if(type==='gcd'){
+      const g=rnd(2,diff===1?9:diff===2?12:15);
+      if(diff===3){
+        let p,q,r;
+        do{ p=rnd(2,9); q=rnd(2,9); r=rnd(2,9); }while(p===q||q===r||p===r||gcd(gcd(p,q),r)!==1);
+        return {
+          tag:'最大公因數', subtype:'三個數',
+          html:`${N(p*g)}、${N(q*g)}、${N(r*g)} 的最大公因數是多少？`,
+          input:'number', answers:[String(g)],
+          hint:'先找兩個數的最大公因數，再和第三個數找一次。',
+          review:`(${p*g}, ${q*g}, ${r*g}) 的最大公因數`
+        };
+      }
+      const [p,q]=coprimePair(1,diff===1?6:9);
+      return {
+        tag:'最大公因數', subtype:'兩個數',
+        html:`${N(p*g)} 和 ${N(q*g)} 的最大公因數是多少？`,
+        input:'number', answers:[String(g)],
+        hint:'列出兩個數的因數，找出共同因數中最大的；也可以用短除法。',
+        review:`(${p*g}, ${q*g}) 的最大公因數`
+      };
+    }
+    if(type==='lcm'){
+      if(diff===3){
+        let a,b,c;
+        do{ a=rnd(2,12); b=rnd(2,12); c=rnd(2,12); }while(a===b||b===c||a===c);
+        const l=lcm(lcm(a,b),c);
+        return {
+          tag:'最小公倍數', subtype:'三個數',
+          html:`${N(a)}、${N(b)}、${N(c)} 的最小公倍數是多少？`,
+          input:'number', answers:[String(l)],
+          hint:'先找兩個數的最小公倍數，再和第三個數找一次。',
+          review:`[${a}, ${b}, ${c}] 的最小公倍數`
+        };
+      }
+      const top=diff===1?12:20;
+      let a,b; do{ a=rnd(2,top); b=rnd(2,top); }while(a===b);
+      return {
+        tag:'最小公倍數', subtype:'兩個數',
+        html:`${N(a)} 和 ${N(b)} 的最小公倍數是多少？`,
+        input:'number', answers:[String(lcm(a,b))],
+        hint:'列出較大數的倍數，找出第一個也是另一個數倍數的數。',
+        review:`[${a}, ${b}] 的最小公倍數`
+      };
+    }
+    if(type==='gcdApp'){
+      const g=rnd(3,diff===2?9:15);
+      let [p,q]=coprimePair(2,diff===2?5:7); if(p<q)[p,q]=[q,p];
+      if(pick([true,false])){
+        return {
+          tag:'最大公因數', subtype:'裁正方形',
+          html:`一張長 ${N(p*g)} 公分、寬 ${N(q*g)} 公分的長方形紙，<br>要剪成同樣大小的正方形，而且紙不能有剩，<br>正方形的邊長最長是幾公分？`,
+          input:'number', answers:[String(g)], unit:'公分',
+          hint:'正方形的邊長要同時是長和寬的因數，取最大的那個。',
+          review:`${p*g}×${q*g} 的紙剪最大正方形`
+        };
+      }
+      return {
+        tag:'最大公因數', subtype:'平分問題',
+        html:`有 ${N(p*g)} 顆蘋果和 ${N(q*g)} 顆橘子，要平分給一些小朋友，<br>每人分到的蘋果一樣多、橘子也一樣多，而且都沒有剩，<br>最多可以分給幾位小朋友？`,
+        input:'number', answers:[String(g)], unit:'位',
+        hint:'人數要同時能整除蘋果數和橘子數，取最大的那個。',
+        review:`蘋果${p*g}、橘子${q*g} 最多分幾人`
+      };
+    }
+    // lcmApp
+    {
+      if(pick([true,false])){
+        const pool=diff===2?[4,6,8,10,12,15]:[6,8,9,10,12,15,18,20];
+        let a,b; do{ a=pick(pool); b=pick(pool); }while(a===b);
+        return {
+          tag:'最小公倍數', subtype:'同時發車',
+          html:`甲公車每 ${N(a)} 分鐘發一班，乙公車每 ${N(b)} 分鐘發一班，<br>早上 7:00 兩車同時發車，至少再過幾分鐘會再同時發車？`,
+          input:'number', answers:[String(lcm(a,b))], unit:'分鐘',
+          hint:'再同時發車的時間，必須同時是兩個數的倍數，取最小的。',
+          review:`每${a}分、每${b}分 同時發車`
+        };
+      }
+      let a,b; do{ a=rnd(2,12); b=rnd(2,12); }while(a===b);
+      return {
+        tag:'最小公倍數', subtype:'拼正方形',
+        html:`用長 ${N(Math.max(a,b))} 公分、寬 ${N(Math.min(a,b))} 公分的長方形磁磚，<br>同方向拼成一個正方形，正方形的邊長最短是幾公分？`,
+        input:'number', answers:[String(lcm(a,b))], unit:'公分',
+        hint:'正方形的邊長要同時是長和寬的倍數，取最小的那個。',
+        review:`${Math.max(a,b)}×${Math.min(a,b)} 磁磚拼最小正方形`
+      };
+    }
+  },
+
+  /* ── 6-2. 分數除法 ── */
+  fracdiv(diff){
+    const type = pick(diff===1
+      ? ['simplest','sameDen','sameDen','diffDen']
+      : ['simplest','whichSimplest','sameDen','diffDen','diffDen','apply']);
+    const top = diff===1?9:12;
+
+    if(type==='simplest'){
+      let [p,q]=coprimePair(1,top); if(p>q)[p,q]=[q,p];
+      const k=rnd(2,diff===1?5:diff===2?9:15);
+      return {
+        tag:'最簡分數', subtype:'約分',
+        html:`把 ${fracHTML(p*k,q*k)} 約分成最簡分數。`,
+        ...fracAns(p,q), exact:`${p}/${q}`,
+        hint:'分子和分母同除以它們的最大公因數，直到不能再約。',
+        review:`${p*k}/${q*k} 約成最簡分數`
+      };
+    }
+    if(type==='whichSimplest'){
+      let [p,q]=coprimePair(2,15); if(p>q)[p,q]=[q,p];
+      const wrong=new Set();
+      while(wrong.size<3){
+        let [a,b]=coprimePair(1,7); if(a>b)[a,b]=[b,a];
+        const k=rnd(2,4); wrong.add(`${a*k}/${b*k}`);
+      }
+      const options=shuffle([`${p}/${q}`,...wrong]);
+      return {
+        tag:'最簡分數', subtype:'找最簡分數',
+        html:`下面哪一個是<b>最簡分數</b>？`,
+        input:'choice', options, answers:[`${p}/${q}`],
+        optionsHTML:options.map(s=>{const [a,b]=s.split('/');return fracHTML(a,b);}),
+        hint:'分子和分母的公因數只有 1，就是最簡分數。',
+        review:`${options.join('、')} 中的最簡分數`
+      };
+    }
+    if(type==='sameDen'){
+      const d=rnd(3,top);
+      let a,b;
+      do{ a=rnd(1,diff===1?d-1:2*d); b=rnd(1,d-1); }while(a===b||gcd(a,d)!==1||gcd(b,d)!==1);
+      return {
+        tag:'同分母分數除法', subtype:'同分母',
+        html:`${fracHTML(a,d)} ÷ ${fracHTML(b,d)} = ？`,
+        ...fracAns(a,b),
+        hint:'分母相同時，直接用分子相除：a/d ÷ b/d = a ÷ b。',
+        review:`${a}/${d} ÷ ${b}/${d}`
+      };
+    }
+    if(type==='diffDen'){
+      let d1,d2,n1,n2;
+      do{ d1=rnd(2,top); d2=rnd(2,top); }while(d1===d2);
+      do{ n2=rnd(1,diff===3?2*d2:d2-1); }while(gcd(n2,d2)!==1);
+      // 普通以上偶爾出「整數 ÷ 分數」
+      if(diff>1 && rnd(0,2)===0){
+        const w=rnd(2,12);
+        return {
+          tag:'異分母分數除法', subtype:'整數÷分數',
+          html:`${N(w)} ÷ ${fracHTML(n2,d2)} = ？`,
+          ...fracAns(w*d2,n2),
+          hint:'除以一個分數，等於乘以它的倒數。',
+          review:`${w} ÷ ${n2}/${d2}`
+        };
+      }
+      do{ n1=rnd(1,diff===3?2*d1:d1-1); }while(gcd(n1,d1)!==1);
+      return {
+        tag:'異分母分數除法', subtype:'異分母',
+        html:`${fracHTML(n1,d1)} ÷ ${fracHTML(n2,d2)} = ？`,
+        ...fracAns(n1*d2,d1*n2),
+        hint:'除以一個分數，等於乘以它的倒數；也可以先通分再把分子相除。',
+        review:`${n1}/${d1} ÷ ${n2}/${d2}`
+      };
+    }
+    // apply
+    {
+      if(pick([true,false])){
+        let n,d; do{ d=rnd(2,top); n=rnd(1,d-1); }while(gcd(n,d)!==1);
+        const k=rnd(3,diff===2?12:20);
+        return {
+          tag:'異分母分數除法', subtype:'包含除',
+          html:`一條緞帶長 ${fracDisp(k*n,d)} 公尺，每 ${fracHTML(n,d)} 公尺剪成一段，<br>可以剪成幾段？`,
+          input:'number', answers:[String(k)], unit:'段',
+          hint:'總長 ÷ 每段長 = 段數。',
+          review:`${fracText(...simp(k*n,d))} 公尺 ÷ ${n}/${d} 公尺`
+        };
+      }
+      let n1,d1,n2,d2;
+      do{ d1=rnd(2,top); n1=rnd(1,2*d1); }while(gcd(n1,d1)!==1);
+      do{ d2=rnd(2,6); n2=rnd(1,d2-1); }while(gcd(n2,d2)!==1);
+      return {
+        tag:'異分母分數除法', subtype:'速率',
+        html:`小明 ${fracHTML(n2,d2)} 小時走了 ${fracHTML(n1,d1)} 公里，<br>平均每小時走幾公里？`,
+        ...fracAns(n1*d2,d1*n2), unit:'公里',
+        hint:'距離 ÷ 時間 = 每小時走的距離。',
+        review:`${n1}/${d1} 公里 ÷ ${n2}/${d2} 小時`
+      };
+    }
+  },
+
+  /* ── 6-3. 小數除法 ── */
+  decdiv(diff){
+    const type = pick(diff===1
+      ? ['div1','div1','div2','round']
+      : ['div1','div2','round','roundApp']);
+
+    if(type==='div1'||type==='div2'){
+      const sc = type==='div1'?10:100;
+      let dv; do{ dv=rnd(2,type==='div1'?(diff===1?49:99):(diff===1?99:499)); }while(dv%10===0);
+      // 簡單只出整數商，其餘可能出一位小數的商
+      const qs = diff===1 ? 1 : pick([1,1,10]);
+      const qv = rnd(2,diff===3?99:30);
+      return {
+        tag: type==='div1'?'除以一位小數':'除以二位小數', subtype:'計算',
+        html:`${N(trimNum(dv*qv/(sc*qs)))} ÷ ${N(trimNum(dv/sc))} = ？`,
+        input:'number', answers:[trimNum(qv/qs)],
+        hint:`除數和被除數的小數點同時向右移 ${sc===10?1:2} 位，變成除以整數再算。`,
+        review:`${trimNum(dv*qv/(sc*qs))} ÷ ${trimNum(dv/sc)}`
+      };
+    }
+    if(type==='round'){
+      const k = diff===1 ? pick([0,1]) : pick([1,2]);
+      const place = ['整數','小數第一位','小數第二位'][k];
+      // 實際值 = A ÷ B；挑戰題的被除數和除數都是一位小數
+      const s = Math.pow(10,k);
+      let A,B;
+      do{
+        A = diff===3 ? rnd(100,999) : rnd(10,diff===1?99:999);
+        B = diff===3 ? rnd(11,99) : rnd(3,9);
+      }while((A*s*10)%B===0 || (diff===3 && B%10===0)); // 確保真的需要四捨五入
+      const shown = diff===3 ? [trimNum(A/10),trimNum(B/10)] : [A,B];
+      const R = Math.floor((2*A*s + B)/(2*B)); // 四捨五入（整數運算）
+      return {
+        tag:'除法與概數', subtype:'四捨五入',
+        html:`${N(shown[0])} ÷ ${N(shown[1])} 的商，用四捨五入法取到<b>${place}</b>是多少？`,
+        input:'number', answers:[trimNum(R/s)], ansLabel:(R/s).toFixed(k),
+        hint:`商算到${place}的下一位，再四捨五入。`,
+        review:`${shown[0]} ÷ ${shown[1]} 取到${place}`
+      };
+    }
+    // roundApp：無條件捨去 / 無條件進入
+    {
+      let T,P; // 以 0.1 為單位
+      do{ T=rnd(50,diff===2?200:500); P=rnd(3,diff===2?20:35); }while(P%10===0 || T%P===0 || T<P*2);
+      if(pick([true,false])){
+        return {
+          tag:'除法與概數', subtype:'無條件捨去',
+          html:`一條繩子長 ${N(trimNum(T/10))} 公尺，每 ${N(trimNum(P/10))} 公尺剪成一段，<br>最多可以剪成幾段？`,
+          input:'number', answers:[String(Math.floor(T/P))], unit:'段',
+          hint:'剩下不夠一段的要捨去（無條件捨去法）。',
+          review:`${trimNum(T/10)} ÷ ${trimNum(P/10)} 最多幾段`
+        };
+      }
+      return {
+        tag:'除法與概數', subtype:'無條件進入',
+        html:`有 ${N(trimNum(T/10))} 公升的果汁，每個瓶子最多裝 ${N(trimNum(P/10))} 公升，<br>要全部裝完，至少需要幾個瓶子？`,
+        input:'number', answers:[String(Math.ceil(T/P))], unit:'個',
+        hint:'剩下的果汁也要裝，所以要多用一個瓶子（無條件進入法）。',
+        review:`${trimNum(T/10)} ÷ ${trimNum(P/10)} 至少幾瓶`
+      };
+    }
+  },
+
+  /* ── 6-4. 比和相等的比、最簡整數比、比值 ── */
+  ratio6(diff){
+    const type = pick(diff===1
+      ? ['equal','simpleInt','value']
+      : ['equal','pickEqual','simpleInt','simpleDec','simpleFrac','value']);
+
+    if(type==='equal'){
+      const [p,q]=coprimePair(1,9);
+      let k1,k2; do{ k1=rnd(1,6); k2=rnd(2,diff===1?5:9); }while(k1===k2);
+      const t=[p*k1,q*k1,p*k2,q*k2];
+      const idx = diff===1 ? pick([2,3]) : rnd(0,3);
+      const s=t.map((v,i)=>i===idx?'？':v);
+      return {
+        tag:'相等的比', subtype:'求未知項',
+        html:`${N(`${s[0]} : ${s[1]} = ${s[2]} : ${s[3]}`)}，問號是多少？`,
+        input:'number', answers:[String(t[idx])],
+        hint:'前項和後項同時乘以（或除以）同一個不為 0 的數，比會相等。',
+        review:`${s[0]}:${s[1]} = ${s[2]}:${s[3]}`
+      };
+    }
+    if(type==='pickEqual'){
+      const [p,q]=coprimePair(1,9);
+      let k1,k2; do{ k1=rnd(2,6); k2=rnd(2,9); }while(k1===k2);
+      const a=p*k1, b=q*k1, c=p*k2, d=q*k2;
+      const seen=new Set([`${c} : ${d}`]), wrong=[];
+      for(const [x,y] of shuffle([[c+1,d],[d,c],[p+k2,q+k2],[c,d+1],[c-1,d],[c+k2,d]])){
+        const key=`${x} : ${y}`;
+        if(x>0 && y>0 && x*q!==y*p && !seen.has(key)){ seen.add(key); wrong.push(key); }
+        if(wrong.length===3) break;
+      }
+      const options=shuffle([`${c} : ${d}`,...wrong]);
+      return {
+        tag:'相等的比', subtype:'找相等的比',
+        html:`下面哪一個比和 ${N(`${a} : ${b}`)} 相等？`,
+        input:'choice', options, answers:[`${c} : ${d}`],
+        hint:'把每個比化成最簡整數比，或算出比值來比較。',
+        review:`和 ${a}:${b} 相等的比`
+      };
+    }
+    if(type==='simpleInt'){
+      const [p,q]=coprimePair(1,diff===1?9:12);
+      const k=rnd(2,diff===1?6:diff===2?12:25);
+      return {
+        tag:'最簡整數比', subtype:'整數比',
+        html:`把 ${N(`${p*k} : ${q*k}`)} 化成最簡整數比。`,
+        input:'ratio', strictRatio:true, answers:[`${p}:${q}`], ansLabel:`${p} : ${q}`,
+        hint:'前項和後項同除以它們的最大公因數。',
+        review:`${p*k} : ${q*k}`
+      };
+    }
+    if(type==='simpleDec'){
+      const [p,q]=coprimePair(1,9);
+      const sc = diff===3 ? pick([10,100]) : 10;
+      let k; do{ k = sc===10 ? rnd(1,9) : rnd(11,99); }while((p*k)%sc===0 && (q*k)%sc===0);
+      const a=trimNum(p*k/sc), b=trimNum(q*k/sc);
+      return {
+        tag:'最簡整數比', subtype:'小數比',
+        html:`把 ${N(`${a} : ${b}`)} 化成最簡整數比。`,
+        input:'ratio', strictRatio:true, answers:[`${p}:${q}`], ansLabel:`${p} : ${q}`,
+        hint:`前項和後項同乘 ${sc} 變成整數比，再化簡。`,
+        review:`${a} : ${b}`
+      };
+    }
+    if(type==='simpleFrac'){
+      let n1,d1,n2,d2,x,y;
+      do{
+        d1=rnd(2,9); n1=rnd(1,d1-1); d2=rnd(2,9); n2=rnd(1,d2-1);
+        [x,y]=simp(n1*d2,n2*d1);
+      }while(gcd(n1,d1)!==1 || gcd(n2,d2)!==1 || x===y);
+      return {
+        tag:'最簡整數比', subtype:'分數比',
+        html:`把 ${fracHTML(n1,d1)} : ${fracHTML(n2,d2)} 化成最簡整數比。`,
+        input:'ratio', strictRatio:true, answers:[`${x}:${y}`], ansLabel:`${x} : ${y}`,
+        hint:'前項和後項同乘兩個分母的最小公倍數，變成整數比再化簡。',
+        review:`${n1}/${d1} : ${n2}/${d2}`
+      };
+    }
+    // value：比值
+    {
+      const [p,q]=coprimePair(1,diff===1?9:12);
+      const k=rnd(2,diff===1?5:9);
+      return {
+        tag:'比值', subtype:'求比值',
+        html:`${N(`${p*k} : ${q*k}`)} 的比值是多少？`,
+        ...fracAns(p,q),
+        hint:'比值 = 前項 ÷ 後項，可以寫成分數。',
+        review:`${p*k} : ${q*k} 的比值`
+      };
+    }
+  },
+
+  /* ── 6-5. 兩量關係 ── */
+  twoqty(diff){
+    const type = pick(diff===1
+      ? ['concept','compare','findBase','times']
+      : ['compare','findBase','times','sum','sum','diff','diff']);
+    const [p,q]=coprimePair(1,diff===1?5:diff===2?9:12);
+    const k=rnd(2,diff===1?6:diff===3?15:10);
+    const rH = q===1 ? N(p) : fracHTML(p,q);
+    const rT = q===1 ? `${p}` : `${p}/${q}`;
+
+    if(type==='concept'){
+      const sc=pick([
+        {s:'弟弟的身高是哥哥的幾倍？', cmp:'弟弟', base:'哥哥'},
+        {s:'媽媽的年齡是小明的 4 倍。', cmp:'媽媽', base:'小明'},
+        {s:'蘋果的數量是橘子的 2/3 倍。', cmp:'蘋果', base:'橘子'},
+        {s:'鉛筆的價錢是原子筆的 0.6 倍。', cmp:'鉛筆', base:'原子筆'},
+        {s:'貓的體重是狗的幾分之幾？', cmp:'貓', base:'狗'}
+      ]);
+      const ask=pick(['基準量','比較量']);
+      return {
+        tag:'基準量與比較量', subtype:'認識',
+        html:`「${sc.s}」<br>這句話中，<b>${ask}</b>是誰？`,
+        input:'choice', options:shuffle([sc.cmp,sc.base]), answers:[ask==='基準量'?sc.base:sc.cmp],
+        hint:'「A 是 B 的幾倍」：B 是拿來比的標準（基準量），A 是被比的（比較量）。',
+        review:`「${sc.s}」的${ask}`
+      };
+    }
+    if(type==='compare'){
+      return {
+        tag:'基準量與比較量', subtype:'求比較量',
+        html:`姊姊有 ${N(q*k)} 元，妹妹的錢是姊姊的 ${rH} 倍，<br>妹妹有幾元？`,
+        input:'number', answers:[String(p*k)], unit:'元',
+        hint:'比較量 = 基準量 × 倍數。',
+        review:`姊姊${q*k}元，妹妹是 ${rT} 倍`
+      };
+    }
+    if(type==='findBase'){
+      return {
+        tag:'基準量與比較量', subtype:'求基準量',
+        html:`紅繩長 ${N(p*k)} 公分，是藍繩的 ${rH} 倍，<br>藍繩長幾公分？`,
+        input:'number', answers:[String(q*k)], unit:'公分',
+        hint:'基準量 = 比較量 ÷ 倍數。',
+        review:`紅繩${p*k}公分是藍繩的 ${rT} 倍`
+      };
+    }
+    if(type==='times'){
+      return {
+        tag:'基準量與比較量', subtype:'求倍數',
+        html:`哥哥有 ${N(q*k)} 張卡片，弟弟有 ${N(p*k)} 張，<br>弟弟的卡片是哥哥的幾倍？`,
+        ...fracAns(p,q),
+        hint:'倍數 = 比較量 ÷ 基準量；「是哥哥的」→ 哥哥是基準量。',
+        review:`弟弟${p*k}張是哥哥${q*k}張的幾倍`
+      };
+    }
+    if(type==='sum'){
+      const askBase=pick([true,false]);
+      return {
+        tag:'兩量和問題', subtype:askBase?'求基準量':'求比較量',
+        html:`紅繩長度是藍繩的 ${rH} 倍，兩條繩子共長 ${N((p+q)*k)} 公分，<br>${askBase?'藍':'紅'}繩長幾公分？`,
+        input:'number', answers:[String(askBase?q*k:p*k)], unit:'公分',
+        hint:`把藍繩當作 1，兩條合起來是 (1 + ${rT}) 倍，藍繩 = 總長 ÷ (1 + ${rT})。`,
+        review:`紅是藍的 ${rT} 倍，共 ${(p+q)*k}，求${askBase?'藍':'紅'}`
+      };
+    }
+    // diff：兩量差
+    {
+      const askBase=pick([true,false]);
+      const more=p>q;
+      return {
+        tag:'兩量差問題', subtype:askBase?'求基準量':'求比較量',
+        html:`今年果園的收成是去年的 ${rH} 倍，比去年${more?'多':'少'} ${N(Math.abs(p-q)*k)} 公斤，<br>${askBase?'去年':'今年'}收成多少公斤？`,
+        input:'number', answers:[String(askBase?q*k:p*k)], unit:'公斤',
+        hint:`把去年當作 1，兩年相差 ${more?`(${rT} − 1)`:`(1 − ${rT})`} 倍，就是 ${Math.abs(p-q)*k} 公斤。`,
+        review:`今年是去年的 ${rT} 倍，${more?'多':'少'} ${Math.abs(p-q)*k}，求${askBase?'去年':'今年'}`
+      };
+    }
+  },
+
+  /* ── 6-6. 圓周長與扇形周長（圓周率 3.14） ── */
+  circle(diff){
+    const type = pick(diff===1
+      ? ['pi','circ','circ','arc']
+      : ['pi','circ','arc','sector','sector','apply','apply']);
+    // 長度都先用「× 100」的整數算，避免浮點誤差
+    const cm = h=>trimNum(h/100);
+
+    if(type==='pi'){
+      if(diff===1 && pick([true,false])){
+        const c=pick([
+          {q:'圓周率是「圓周長」除以什麼得到的？', o:['直徑','半徑','圓心','面積'], a:'直徑'},
+          {q:'不論圓的大小，圓周長大約是直徑的幾倍？', o:['2 倍','3.14 倍','6.28 倍','4 倍'], a:'3.14 倍'},
+          {q:'圓周長大約是半徑的幾倍？', o:['3.14 倍','6.28 倍','2 倍','1.57 倍'], a:'6.28 倍'}
+        ]);
+        return {
+          tag:'圓周率', subtype:'認識圓周率',
+          html:c.q, input:'choice', options:c.o, answers:[c.a],
+          hint:'圓周率 = 圓周長 ÷ 直徑 ≈ 3.14；直徑是半徑的 2 倍。',
+          review:c.q
+        };
+      }
+      const d=rnd(1,diff===1?20:30)*(diff===1?1:2);
+      const askR = diff>1 && pick([true,false]);
+      return {
+        tag:'圓周率', subtype:askR?'求半徑':'求直徑',
+        html:`一個圓的圓周長是 ${N(cm(314*d))} 公分，${askR?'半徑':'直徑'}是幾公分？（圓周率用 3.14）`,
+        visual:circleSVG(`圓周長 ${cm(314*d)} 公分`, askR),
+        input:'number', answers:[String(askR?d/2:d)], unit:'公分',
+        hint:askR?'直徑 = 圓周長 ÷ 3.14，半徑 = 直徑 ÷ 2。':'直徑 = 圓周長 ÷ 3.14。',
+        review:`圓周長 ${cm(314*d)} 求${askR?'半徑':'直徑'}`
+      };
+    }
+    if(type==='circ'){
+      if(diff===3){
+        let d10; do{ d10=rnd(11,199); }while(d10%10===0);
+        return {
+          tag:'圓周長', subtype:'小數直徑',
+          html:`直徑 ${N(trimNum(d10/10))} 公分的圓，圓周長是幾公分？（圓周率用 3.14）`,
+          visual:circleSVG(`直徑 ${trimNum(d10/10)} 公分`, false),
+          input:'number', answers:[trimNum(d10*314/1000)], unit:'公分',
+          hint:'圓周長 = 直徑 × 3.14。',
+          review:`直徑 ${trimNum(d10/10)} 的圓周長`
+        };
+      }
+      const useR = diff===2 && pick([true,false]);
+      const v=rnd(1,diff===1?20:30);
+      return {
+        tag:'圓周長', subtype:useR?'已知半徑':'已知直徑',
+        html:`${useR?'半徑':'直徑'} ${N(v)} 公分的圓，圓周長是幾公分？（圓周率用 3.14）`,
+        visual:circleSVG(`${useR?'半徑':'直徑'} ${v} 公分`, useR),
+        input:'number', answers:[cm(314*v*(useR?2:1))], unit:'公分',
+        hint:useR?'圓周長 = 半徑 × 2 × 3.14。':'圓周長 = 直徑 × 3.14。',
+        review:`${useR?'半徑':'直徑'} ${v} 的圓周長`
+      };
+    }
+    if(type==='arc'||type==='sector'){
+      const degs = diff===1?[180,90]:diff===2?[180,90,270,60,120]:[45,30,60,120,135,150,270];
+      const deg=pick(degs);
+      let r; do{ r=rnd(2,diff===1?10:20); }while((r*deg)%90!==0); // 讓弧長剛好到小數第二位
+      const arcH=628*r*deg/360;
+      const isArc = type==='arc';
+      return {
+        tag:'扇形弧長與周長', subtype:isArc?'弧長':'扇形周長',
+        html:`半徑 ${N(r)} 公分、圓心角 ${N(deg+'°')} 的扇形，${isArc?'<b>弧長</b>':'<b>周長</b>'}是幾公分？（圓周率用 3.14）`,
+        visual:sectorSVG(deg,r),
+        input:'number', answers:[cm(isArc?arcH:arcH+200*r)], unit:'公分',
+        hint:isArc?'弧長 = 半徑 × 2 × 3.14 × 圓心角/360。':'扇形周長 = 弧長 + 2 條半徑，別忘了兩條半徑！',
+        review:`半徑${r}、${deg}° 扇形的${isArc?'弧長':'周長'}`
+      };
+    }
+    // apply
+    {
+      const kinds = diff===2 ? ['wheel','semi','reverse'] : ['wheel','semi','track','split'];
+      const kind=pick(kinds);
+      if(kind==='wheel'){
+        const d=rnd(3,8)*10, n=rnd(2,diff===2?10:25);
+        return {
+          tag:'圓周長的應用', subtype:'滾動距離',
+          html:`腳踏車輪子的直徑是 ${N(d)} 公分，輪子滾動 ${N(n)} 圈，<br>腳踏車前進了幾公分？（圓周率用 3.14）`,
+          input:'number', answers:[cm(314*d*n)], unit:'公分',
+          hint:'輪子滾一圈前進的距離 = 輪子的圓周長。',
+          review:`直徑${d} 輪子滾${n}圈`
+        };
+      }
+      if(kind==='semi'){
+        const d=rnd(2,diff===2?20:40)*2;
+        return {
+          tag:'圓周長的應用', subtype:'半圓周長',
+          html:`一個半圓形花圃的直徑是 ${N(d)} 公尺，<br>沿著花圃外圍（含直徑那一邊）圍一圈籬笆，籬笆長幾公尺？（圓周率用 3.14）`,
+          input:'number', answers:[cm(157*d+100*d)], unit:'公尺',
+          hint:'半圓周長 = 直徑 × 3.14 ÷ 2，再加上直徑。',
+          review:`直徑${d} 的半圓周長`
+        };
+      }
+      if(kind==='reverse'){
+        const r=rnd(2,25);
+        return {
+          tag:'圓周長的應用', subtype:'由周長求半徑',
+          html:`一個圓形水池的周長是 ${N(cm(628*r))} 公尺，<br>水池的半徑是幾公尺？（圓周率用 3.14）`,
+          input:'number', answers:[String(r)], unit:'公尺',
+          hint:'半徑 = 圓周長 ÷ 3.14 ÷ 2。',
+          review:`周長 ${cm(628*r)} 求半徑`
+        };
+      }
+      if(kind==='track'){
+        const L=rnd(5,12)*10, D=rnd(3,8)*10;
+        return {
+          tag:'圓周長的應用', subtype:'操場跑道',
+          html:`操場跑道由兩條長 ${N(L)} 公尺的直線，和兩端各一個直徑 ${N(D)} 公尺的半圓組成，<br>跑一圈是幾公尺？（圓周率用 3.14）`,
+          input:'number', answers:[cm(200*L+314*D)], unit:'公尺',
+          hint:'兩個半圓合起來是一個完整的圓，再加上兩條直線。',
+          review:`直線${L}×2 + 直徑${D} 的圓`
+        };
+      }
+      // split：圓平分成扇形
+      const n=pick([2,3,4,6]);
+      let r; do{ r=rnd(2,20); }while(n%3===0 && r%3!==0);
+      return {
+        tag:'圓周長的應用', subtype:'平分扇形',
+        html:`把一個半徑 ${N(r)} 公分的圓形紙片平分成 ${N(n)} 個相同的扇形，<br>每個扇形的周長是幾公分？（圓周率用 3.14）`,
+        input:'number', answers:[cm(628*r/n+200*r)], unit:'公分',
+        hint:'每個扇形的弧長 = 圓周長 ÷ 份數，再加上 2 條半徑。',
+        review:`半徑${r} 的圓平分 ${n} 份，扇形周長`
+      };
+    }
+  },
+
+  /* ── 6-7. 怎樣解題 ── */
+  solve(diff){
+    const type = pick(['interval','pattern','combo','sumdiff']);
+
+    if(type==='interval'){
+      const kind = pick(diff===1 ? ['both','none','circle'] : ['both','none','circle','saw','stairs']);
+      const g=pick([2,3,4,5,6,8,10]), n=rnd(diff===1?3:5,diff===3?40:20), L=g*n;
+      if(kind==='saw'){
+        const m=rnd(3,12), t=rnd(2,9);
+        return {
+          tag:'間隔問題', subtype:'鋸木頭',
+          html:`把一根木頭鋸成 ${N(m)} 段，每鋸一次要 ${N(t)} 分鐘，<br>一共要鋸幾分鐘？`,
+          input:'number', answers:[String((m-1)*t)], unit:'分鐘',
+          hint:'鋸成 m 段，只要鋸 (m − 1) 次。',
+          review:`鋸成${m}段，每次${t}分`
+        };
+      }
+      if(kind==='stairs'){
+        const s=rnd(10,30), m=rnd(4,9);
+        return {
+          tag:'間隔問題', subtype:'爬樓梯',
+          html:`小明從 1 樓走到 3 樓要 ${N(2*s)} 秒，照這樣的速度，<br>從 1 樓走到 ${N(m)} 樓要幾秒？`,
+          input:'number', answers:[String(s*(m-1))], unit:'秒',
+          hint:'1 樓到 3 樓只爬了 2 層樓梯，先算爬一層要幾秒。',
+          review:`1→3 樓 ${2*s} 秒，1→${m} 樓`
+        };
+      }
+      const sc={
+        both:  {html:`一條長 ${N(L)} 公尺的步道，一側每隔 ${N(g)} 公尺種一棵樹，<br>頭尾兩端都要種，一共要種幾棵樹？`, ans:n+1, unit:'棵', hint:'兩端都種：棵數 = 間隔數 + 1。', sub:'兩端都種'},
+        none:  {html:`一條長 ${N(L)} 公尺的步道，一側每隔 ${N(g)} 公尺種一棵樹，<br>頭尾兩端都不種，一共要種幾棵樹？`, ans:n-1, unit:'棵', hint:'兩端都不種：棵數 = 間隔數 − 1。', sub:'兩端不種'},
+        circle:{html:`圓形池塘的周長是 ${N(L)} 公尺，沿著池邊每隔 ${N(g)} 公尺放一盞燈，<br>一共要放幾盞燈？`, ans:n, unit:'盞', hint:'圍成一圈：盞數 = 間隔數。', sub:'圍成一圈'}
+      }[kind];
+      return {
+        tag:'間隔問題', subtype:sc.sub,
+        html:sc.html, input:'number', answers:[String(sc.ans)], unit:sc.unit,
+        hint:`先算有幾個間隔（${L} ÷ ${g}）。${sc.hint}`,
+        review:`${L} 公尺每隔 ${g} 公尺（${sc.sub}）`
+      };
+    }
+    if(type==='pattern'){
+      const kind = pick(diff===3 ? ['seq','square','triangle','table','corner'] : ['seq','square','triangle','table']);
+      const n=rnd(diff===1?5:8, diff===1?10:diff===2?20:50);
+      if(kind==='seq'){
+        const a=rnd(1,10), d=rnd(2,diff===3?12:6);
+        return {
+          tag:'數形規律', subtype:'數列',
+          html:`${N(`${a}、${a+d}、${a+2*d}、${a+3*d}、……`)}<br>照這個規律，第 ${N(n)} 個數是多少？`,
+          input:'number', answers:[String(a+(n-1)*d)],
+          hint:`每次增加 ${d}，第 n 個數 = 第 1 個數 + (n − 1) × ${d}。`,
+          review:`${a}, ${a+d}, ${a+2*d}… 第 ${n} 個`
+        };
+      }
+      if(kind==='corner'){
+        return {
+          tag:'數形規律', subtype:'正方形排棋子',
+          html:`把棋子排成一個正方形，每一邊都有 ${N(n)} 顆（四個角都有放），<br>一共用了幾顆棋子？`,
+          input:'number', answers:[String(4*(n-1))], unit:'顆',
+          hint:'角上的棋子被兩邊共用，總數 = 4 × (每邊個數 − 1)。',
+          review:`正方形每邊 ${n} 顆棋子`
+        };
+      }
+      const sc={
+        square:  {html:'用火柴棒排正方形（排成一排），1 個要 4 根，2 個要 7 根，3 個要 10 根……', q:`排 ${N(n)} 個正方形要幾根火柴？`, ans:3*n+1, unit:'根', hint:'第 1 個用 4 根，之後每多 1 個正方形只多 3 根。', sub:'火柴正方形'},
+        triangle:{html:'用火柴棒排三角形（排成一排），1 個要 3 根，2 個要 5 根，3 個要 7 根……', q:`排 ${N(n)} 個三角形要幾根火柴？`, ans:2*n+1, unit:'根', hint:'第 1 個用 3 根，之後每多 1 個三角形只多 2 根。', sub:'火柴三角形'},
+        table:   {html:'1 張方桌可以坐 4 人，2 張併成一排可以坐 6 人，3 張併成一排可以坐 8 人……', q:`${N(n)} 張方桌併成一排，可以坐幾人？`, ans:2*n+2, unit:'人', hint:'每多 1 張桌子，就多 2 個位子。', sub:'併桌子'}
+      }[kind];
+      return {
+        tag:'數形規律', subtype:sc.sub,
+        html:`${sc.html}<br>${sc.q}`, input:'number', answers:[String(sc.ans)], unit:sc.unit,
+        hint:sc.hint, review:`${sc.sub}：第 ${n} 個`
+      };
+    }
+    if(type==='combo'){
+      const kind = pick(diff===1 ? ['clothes','handshake','order'] : ['clothes','handshake','order','cards','officers']);
+      if(kind==='clothes'){
+        const a=rnd(2,5), b=rnd(2,5), c=diff===3?rnd(2,3):1;
+        return {
+          tag:'選擇與組合', subtype:'搭配',
+          html:`小美有 ${N(a)} 件上衣、${N(b)} 件裙子${c>1?`、${N(c)} 雙鞋子`:''}，<br>每次各選一樣來搭配，一共有幾種穿法？`,
+          input:'number', answers:[String(a*b*c)], unit:'種',
+          hint:'每件上衣都可以配每件裙子，用乘法算。',
+          review:`${a}上衣 × ${b}裙子${c>1?` × ${c}鞋`:''}`
+        };
+      }
+      if(kind==='handshake'){
+        const n=rnd(3,diff===1?6:12);
+        return {
+          tag:'選擇與組合', subtype:'握手',
+          html:`${N(n)} 位同學見面，每兩人都要握一次手，<br>一共握了幾次手？`,
+          input:'number', answers:[String(n*(n-1)/2)], unit:'次',
+          hint:'每人要和另外 (n − 1) 人握手，但每次握手被兩人各算一次，所以要 ÷ 2。',
+          review:`${n} 人兩兩握手`
+        };
+      }
+      if(kind==='order'){
+        const n=diff===1?3:pick([3,4,5]);
+        const f=[1,1,2,6,24,120][n];
+        return {
+          tag:'選擇與組合', subtype:'排列',
+          html:`${N(n)} 位同學排成一排照相，一共有幾種不同的排法？`,
+          input:'number', answers:[String(f)], unit:'種',
+          hint:'第 1 個位置有 n 種選法，第 2 個位置剩 (n − 1) 種……依序相乘。',
+          review:`${n} 人排一排`
+        };
+      }
+      if(kind==='cards'){
+        const k=rnd(3,5);
+        const withZero = diff===3 && pick([true,false]);
+        const digits = shuffle([1,2,3,4,5,6,7,8,9]).slice(0,withZero?k-1:k);
+        if(withZero) digits.push(0);
+        digits.sort((a,b)=>a-b);
+        return {
+          tag:'選擇與組合', subtype:'數字卡',
+          html:`用 ${N(digits.join('、'))} 這 ${k} 張數字卡，選 2 張排成二位數，<br>可以排出幾個不同的二位數？`,
+          input:'number', answers:[String(withZero?(k-1)*(k-1):k*(k-1))], unit:'個',
+          hint:withZero?'十位不能是 0，所以十位有 (張數 − 1) 種選法。':'十位有 k 種選法，個位剩下 (k − 1) 種。',
+          review:`數字卡 ${digits.join(',')} 排二位數`
+        };
+      }
+      const n=rnd(4,10);
+      return {
+        tag:'選擇與組合', subtype:'選幹部',
+        html:`從 ${N(n)} 位候選人中，選出班長和副班長各一人，<br>一共有幾種選法？`,
+        input:'number', answers:[String(n*(n-1))], unit:'種',
+        hint:'班長有 n 種選法，副班長剩下 (n − 1) 種；兩個職位不同，順序有差。',
+        review:`${n} 人選班長、副班長`
+      };
+    }
+    // sumdiff：和差問題
+    {
+      const small=rnd(5,diff===1?40:diff===2?150:500), D=rnd(2,diff===1?20:80), big=small+D, S=big+small;
+      const kind = pick(diff===1 ? ['numbers','money'] : ['numbers','money','rect']);
+      if(kind==='rect'){
+        return {
+          tag:'和差問題', subtype:'長方形',
+          html:`一個長方形的周長是 ${N(2*S)} 公分，長比寬多 ${N(D)} 公分，<br>長是幾公分？`,
+          input:'number', answers:[String(big)], unit:'公分',
+          hint:'長 + 寬 = 周長 ÷ 2；長 = (和 + 差) ÷ 2。',
+          review:`周長${2*S}，長比寬多${D}`
+        };
+      }
+      const askBig=pick([true,false]);
+      if(kind==='money'){
+        return {
+          tag:'和差問題', subtype:'分錢',
+          html:`哥哥和弟弟共有 ${N(S)} 元，哥哥比弟弟多 ${N(D)} 元，<br>${askBig?'哥哥':'弟弟'}有幾元？`,
+          input:'number', answers:[String(askBig?big:small)], unit:'元',
+          hint:'大的 = (和 + 差) ÷ 2；小的 = (和 − 差) ÷ 2。',
+          review:`和${S}、差${D}，求${askBig?'哥哥':'弟弟'}`
+        };
+      }
+      return {
+        tag:'和差問題', subtype:'兩數和差',
+        html:`兩個數的和是 ${N(S)}，差是 ${N(D)}，<br>${askBig?'較大':'較小'}的數是多少？`,
+        input:'number', answers:[String(askBig?big:small)],
+        hint:'大數 = (和 + 差) ÷ 2；小數 = (和 − 差) ÷ 2。',
+        review:`和${S}、差${D}，求${askBig?'大數':'小數'}`
+      };
+    }
   }
 };
 
 const DIFF_LABEL = {1:'簡單',2:'普通',3:'挑戰'};
 
 const TOPICS = [
-  {key:'decimal',  ico:'🔢', nm:'小數',     ds:'乘法與除法'},
-  {key:'fraction', ico:'🍕', nm:'分數',     ds:'倍數與除法'},
-  {key:'volume',   ico:'📦', nm:'體積',     ds:'計算與比較'},
-  {key:'surface',  ico:'🎁', nm:'表面積',   ds:'拼合與疊加'},
-  {key:'time',     ico:'⏰', nm:'時間計算', ds:'時分換算'},
-  {key:'capacity', ico:'🧃', nm:'容積',     ds:'裝水與溢出'},
-  {key:'ratio',    ico:'⚖️', nm:'比例',     ds:'生活應用'},
-  {key:'percent',  ico:'💯', nm:'百分率',   ds:'折扣與調查'},
+  {key:'decimal',  grade:5, ico:'🔢', nm:'小數',     ds:'乘法與除法'},
+  {key:'fraction', grade:5, ico:'🍕', nm:'分數',     ds:'倍數與除法'},
+  {key:'volume',   grade:5, ico:'📦', nm:'體積',     ds:'計算與比較'},
+  {key:'surface',  grade:5, ico:'🎁', nm:'表面積',   ds:'拼合與疊加'},
+  {key:'time',     grade:5, ico:'⏰', nm:'時間計算', ds:'時分換算'},
+  {key:'capacity', grade:5, ico:'🧃', nm:'容積',     ds:'裝水與溢出'},
+  {key:'ratio',    grade:5, ico:'⚖️', nm:'比例',     ds:'生活應用'},
+  {key:'percent',  grade:5, ico:'💯', nm:'百分率',   ds:'折扣與調查'},
+  {key:'factor',   grade:6, ico:'🔍', nm:'公因數與公倍數', ds:'質數·最大公因數·最小公倍數'},
+  {key:'fracdiv',  grade:6, ico:'🥧', nm:'分數除法', ds:'最簡分數·同分母·異分母'},
+  {key:'decdiv',   grade:6, ico:'➗', nm:'小數除法', ds:'除以小數·除法與概數'},
+  {key:'ratio6',   grade:6, ico:'🧮', nm:'比與比值', ds:'相等的比·最簡整數比'},
+  {key:'twoqty',   grade:6, ico:'👫', nm:'兩量關係', ds:'基準量·兩量和·兩量差'},
+  {key:'circle',   grade:6, ico:'⭕', nm:'圓周長',   ds:'圓周率·扇形弧長與周長'},
+  {key:'solve',    grade:6, ico:'💡', nm:'怎樣解題', ds:'間隔·規律·組合·和差'},
 ];
 
 /* =========================================================
    狀態
 ========================================================= */
-let state = { topic:'decimal', diff:2, count:10, questions:[], answers:[], idx:0 };
+let state = { grade:5, topic:'decimal', diff:2, count:10, questions:[], answers:[], idx:0 };
 
 /* ---- 渲染主題卡 ---- */
 function renderTopics(){
   const g=document.getElementById('topic-grid');
   g.innerHTML='';
-  TOPICS.forEach(t=>{
+  TOPICS.filter(t=>t.grade===state.grade).forEach(t=>{
     const el=document.createElement('button');
     el.className='topic'+(t.key===state.topic?' sel':'');
     el.innerHTML=`<div class="check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -996,6 +1803,13 @@ function renderTopics(){
 }
 renderTopics();
 
+document.getElementById('grade-chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b)return;
+  state.grade=+b.dataset.grade;
+  state.topic=TOPICS.find(t=>t.grade===state.grade).key;
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('on',c===b));
+  renderTopics();
+});
 document.getElementById('diff-chips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b)return;
   state.diff=+b.dataset.diff;
@@ -1042,6 +1856,12 @@ function renderQ({ clearIfFresh=false }={}){
         <input class="field small" id="ans-h" inputmode="numeric" value="${saved?saved.h:''}"> <span class="unit">時</span>
         <input class="field small" id="ans-m" inputmode="numeric" value="${saved?saved.m:''}"> <span class="unit">分</span>
       </span>`;
+  } else if(q.input==='choice'){
+    area.innerHTML=`<span class="lab">答案</span>
+      <div class="opts">${q.options.map((o,i)=>
+        `<button class="chip opt${saved===o?' on':''}" data-v="${o}">${q.optionsHTML?q.optionsHTML[i]:o}</button>`).join('')}</div>`;
+    area.querySelectorAll('.opt').forEach(b=>b.onclick=()=>
+      area.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b)));
   } else {
     const ph = q.input==='fraction' ? '例：3/4' : q.input==='ratio' ? '例：2:3' : '';
     area.innerHTML=`<span class="lab">答案</span>
@@ -1064,6 +1884,9 @@ function saveCurrent(){
     const h=document.getElementById('ans-h').value.trim();
     const m=document.getElementById('ans-m').value.trim();
     state.answers[state.idx]=(h===''&&m==='')?null:{h,m};
+  } else if(q.input==='choice'){
+    const sel=document.querySelector('#answer-area .opt.on');
+    state.answers[state.idx]= sel?sel.dataset.v:null;
   } else {
     const v=document.getElementById('ans-main').value.trim();
     state.answers[state.idx]= v===''?null:v;
@@ -1101,9 +1924,17 @@ function checkOne(q,ans){
   if(q.input==='time'){
     return (+ans.h||0)===q.answers[0].h && (+ans.m||0)===q.answers[0].m;
   }
+  if(q.input==='choice') return ans===q.answers[0];
   if(q.input==='ratio'){
+    // 最簡整數比：必須自己化到最簡
+    if(q.strictRatio){
+      const p=ans.replace(/：/g,':').split(':').map(s=>s.trim());
+      return p.length===2 && /^\d+$/.test(p[0]) && /^\d+$/.test(p[1]) && `${+p[0]}:${+p[1]}`===q.answers[0];
+    }
     const u=normRatio(ans); return u!==null && u===q.answers[0];
   }
+  // 約分題：必須寫成最簡分數
+  if(q.exact) return ans.replace(/\s+/g,'')===q.exact;
   if(q.isFrac){
     const v=parseFrac(ans); if(v===null)return false;
     return Math.abs(v-parseFloat(q.answers[0]))<1e-4;
